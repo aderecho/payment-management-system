@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["resources/js/*"],
+            "ziggy-js": ["./vendor/tightenco/ziggy"]
+        }
+    },
+    "exclude": ["node_modules", "public"]
+}
+// {
+//   "vueCompilerOptions": {
+//     "globalTypesPath": "./node_modules/vue/dist/vue.d.ts"
+//   }
+// }
