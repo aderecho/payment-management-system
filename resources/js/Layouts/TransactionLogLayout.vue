@@ -12,33 +12,29 @@ const menuItems = [
     { name: "Transaction Log", icon: "fa-solid fa-file-export", route: "/TransactionLogPage" },
 ];
 
-const isSidebarOpen = ref(true); 
+const isSidebarOpen = ref(false); 
 const isMobile = computed(() => window.innerWidth < 1024);
 
 onMounted(() => {
-    // Set initial state based on device size
-    if (isMobile.value) {
+    if(isMobile.value){
         isSidebarOpen.value = false;
-    } else {
+    } else{
         isSidebarOpen.value = true;
-    }
+    }   
 });
 
 const toggleSidebar = () => {
     isSidebarOpen.value = !isSidebarOpen.value;
 };
 
-// HANDLERS FOR MOUSE EVENTS
 const openSidebarOnEnter = () => {
-    // Only expand if we are not on a mobile screen
     if (!isMobile.value) {
         isSidebarOpen.value = true;
     }
 };
 
-const closeSidebarOnLeave = () => {
-    // Collapse to icon view when mouse leaves, but only on desktop
-    if (!isMobile.value) {
+const closeSidebarOnLeave = () =>{
+    if(!isMobile.value){
         isSidebarOpen.value = false;
     }
 };
@@ -53,18 +49,21 @@ const closeSidebarOnLeave = () => {
         <Sidebar 
             :menu-items="menuItems" 
             :is-sidebar-open="isSidebarOpen"
-            @mouseenter="openSidebarOnEnter"
-            @mouseleave="closeSidebarOnLeave"
+                @mouseenter="openSidebarOnEnter"
+                @mouseleave="closeSidebarOnLeave"
         />
 
         <main 
-            class="flex-1 transition-all duration-300 p-5 min-w-0" 
-            :style="{ marginLeft: isSidebarOpen ? '12.5rem' : '4.5rem' }" 
-            >
-            <PaymentCards />
+            class="flex-1 transition-all duration-300 p-5 min-w-0 mt-16"
+            :class="{ 
+                'ml-[12.5rem]': isSidebarOpen, 
+                'ml-[4.5rem]': !isSidebarOpen 
+            }">
+
             
             <TransactionList />
         </main>
+        
     </div>
 </div>
 </template>

@@ -5,6 +5,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/TransactionLogPage', function () {
+    return Inertia::render('TransactionLogPage');
+});
+
 Route::get('/CounterPaymentPage', function () {
     return Inertia::render('CounterPaymentPage');
 });
