@@ -59,7 +59,10 @@ const closeSidebarOnLeave = () => {
 
         <main 
             class="flex-1 transition-all duration-300 p-5 min-w-0" 
-            :style="{ marginLeft: isSidebarOpen ? '12.5rem' : '4.5rem' }" 
+            :class="{ 
+                'ml-[12.5rem]': isSidebarOpen, 
+                'ml-[4.5rem]': !isSidebarOpen 
+            }"
             >
             <PaymentCards />
             

@@ -1,24 +1,43 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 //Transaction Table import
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
 
 import PaymentDetailsModal from './PaymentDetailsModal.vue';
+import ReportsModal from './ReportsModal.vue';
 
 
 
 const searchQuery = ref('');
+// ADDED: The actual value used for filtering (updated after a delay)
+const debouncedSearchQuery = ref(''); 
+// ADDED: Variable to hold the debounce timer
+let searchTimeout = null;
+
+// ADDED: Watcher to debounce searchQuery updates
+watch(searchQuery, (newQuery) => {
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+    
+    searchTimeout = setTimeout(() => {
+        debouncedSearchQuery.value = newQuery;
+    }, 300); // 300ms delay
+});
+
+
 // Date - Changed to two reactive variables for the date range
 const startDate = ref('');
 const endDate = ref('');
-//Modal
+//Payment Details Modal
 const showDetailsModal = ref(false); // State to control modal visibility
 const selectedTransaction = ref({}); // State to hold the data for the modal
+//Reports Modal
+const showReportsModal = ref(false); // State to control Reports modal visibility
+const selectedReportTransaction = ref({}); // State to hold data for Reports modal
 
-
-//
 const headers = [
     'Campus Id',
     'Student Name',
@@ -33,10 +52,10 @@ const headers = [
 // NOTE: Added more diverse data for search/filter testing
 const transactions = ref([
     { campusId: '202500001', studentName: 'John Doe', referenceCode: 'xyz123AFC', paymentMethod: 'Maya', transactionType: 'Tuition Fee', date: '07/23/2025', status: 'Posted', amount: 27500, yearLevel: 'First Year', schoolYear: '2025', course:"Computer Science"},
-    { campusId: '202500002', studentName: 'Jane Smith', referenceCode: 'abc987ZYX', paymentMethod: 'Gcash', transactionType: 'Books', date: '07/23/2025', status: 'Floating', amount: 5000, yearLevel: 'Second Year', schoolYear: '2025' },
-    { campusId: '202600010', studentName: 'Chris Johnson', referenceCode: 'DEF456GHI', paymentMethod: 'Bank', transactionType: 'Miscellaneous', date: '07/24/2025', status: 'Posted', amount: 1500, yearLevel: 'Third Year', schoolYear: '2026' },
-    { campusId: '202500001', studentName: 'Bronny James', referenceCode: 'JKL012MNO', paymentMethod: 'Maya', transactionType: 'Tuition Fee', date: '07/25/2025', status: 'Floating', amount: 20000, yearLevel: 'First Year', schoolYear: '2025' },
-    { campusId: '202500001', studentName: 'Michael Williams', referenceCode: 'JKL012MNO', paymentMethod: 'Cash', transactionType: 'Tuition Fee', date: '09/30/2025', status: 'Floating', amount: 30000, yearLevel: 'Fourth Year', schoolYear: '2025' },
+    { campusId: '202500002', studentName: 'Jane Smith', referenceCode: 'abc987ZYX', paymentMethod: 'Gcash', transactionType: 'Books', date: '07/23/2025', status: 'Floating', amount: 5000, yearLevel: 'Second Year', schoolYear: '2025', course: 'Bachelor of Arts (Mass Communication)' },
+    { campusId: '202600010', studentName: 'Chris Johnson', referenceCode: 'DEF456GHI', paymentMethod: 'Bank', transactionType: 'Miscellaneous', date: '07/24/2025', status: 'Posted', amount: 1500, yearLevel: 'Third Year', schoolYear: '2026' , course: 'Bachelor of Science in Mathematics'  },
+    { campusId: '202500001', studentName: 'Bronny James', referenceCode: 'JKL012MNO', paymentMethod: 'Maya', transactionType: 'Tuition Fee', date: '07/25/2025', status: 'Floating', amount: 20000, yearLevel: 'First Year', schoolYear: '2025' , course: 'Bachelor of Arts in Psychology' },
+    { campusId: '202500001', studentName: 'Michael Williams', referenceCode: 'JKL012MNO', paymentMethod: 'Cash', transactionType: 'Tuition Fee', date: '09/30/2025', status: 'Floating', amount: 30000, yearLevel: 'Fourth Year', schoolYear: '2025' , course: 'BSIT' },
 ]);
 
 // Helper function to convert the transaction date format ('MM/DD/YYYY') to a Date object
@@ -65,7 +84,8 @@ const sortedTransactions = computed(() => {
 // COMPUTED PROPERTY FOR FILTERING
 // =========================================================================
 const filteredTransactions = computed(() => {
-    const query = searchQuery.value.toLowerCase().trim();
+    // MODIFIED: Use the debounced search query
+    const query = debouncedSearchQuery.value.toLowerCase().trim();
     const hasDateRangeSelected = startDate.value && endDate.value;
     
     const sourceList = sortedTransactions.value; 
@@ -109,18 +129,7 @@ const filteredTransactions = computed(() => {
     });
 });
 
-// NOTE: If TransactionStatusCell is correctly set up, this function is redundant and should be removed.
-const getStatusClasses = (status) => {
-    switch (status) {
-        case 'Posted':
-            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800';
-        case 'Floating':
-            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-800';
-        default:
-            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800';
-    }
-};
-
+// Payment Details Modal
 // Function to open the modal with specific transaction details
 const openPaymentDetailsModal = (transaction) => {
     selectedTransaction.value = transaction;
@@ -138,7 +147,26 @@ const handleModalPrint = (details) => {
     console.log("Parent received print request for:", details.referenceCode);
     alert(`Initiating print for transaction: ${details.referenceCode}`);
 };
+//Reports Modal
+const openReportsModal = (transaction) => {
+    // Map keys if needed, similar to openPaymentDetailsModal
+    selectedReportTransaction.value = {
+        ...transaction,
+        studentName: transaction.studentName, // Assuming the transaction object already has this
+        course: transaction.course || 'N/A', // Add fallback for course
+    };
+    showReportsModal.value = true;
+};
 
+const closeReportsModal = () => {
+    showReportsModal.value = false;
+    selectedReportTransaction.value = {};
+};
+
+const handleReportModalPrint = (details) => {
+    console.log("Parent received print request for report:", details.referenceCode);
+    alert(`Initiating print for report transaction: ${details.referenceCode}`);
+};
 </script>
 
 <template>
@@ -197,14 +225,14 @@ const handleModalPrint = (details) => {
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium flex space-x-2">
                             
                             <button 
-                                 @click="openPaymentDetailsModal(transaction)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
-                               
-                                View <i class="fa-solid fa-eye ml-1"></i>
+                                    @click="openPaymentDetailsModal(transaction)" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
+                                    
+                                    View <i class="fa-solid fa-eye ml-1"></i>
                             </button>
 
-                            <button class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
-                                Report <i class="fa-solid fa-file-invoice ml-1"></i>
-                            </button>
+                           <button @click="openReportsModal(transaction)" class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
+    Report <i class="fa-solid fa-file-invoice ml-1"></i>
+</button>
 
                         </td>
                     </tr>
@@ -223,4 +251,10 @@ const handleModalPrint = (details) => {
         @close="closePaymentDetailsModal"
         @print="handleModalPrint"
     />
+    <ReportsModal 
+    :show="showReportsModal" 
+    :reportDetails="selectedReportTransaction" 
+    @close="closeReportsModal"
+    @print="handleReportModalPrint"
+/>
 </template>
