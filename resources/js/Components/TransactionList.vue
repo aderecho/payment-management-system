@@ -1,5 +1,7 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+// MODIFIED IMPORTS: Added onMounted and imported axios
+import { ref, computed, watch, onMounted } from 'vue';
+import axios from 'axios'; 
 
 //Transaction Table import
 import TransactionDataCell from './TransactionDataCell.vue';
@@ -9,14 +11,11 @@ import PaymentDetailsModal from './PaymentDetailsModal.vue';
 import ReportsModal from './ReportsModal.vue';
 
 
-
+// --- DEBOUNCING LOGIC ---
 const searchQuery = ref('');
-// ADDED: The actual value used for filtering (updated after a delay)
 const debouncedSearchQuery = ref(''); 
-// ADDED: Variable to hold the debounce timer
 let searchTimeout = null;
 
-// ADDED: Watcher to debounce searchQuery updates
 watch(searchQuery, (newQuery) => {
     if (searchTimeout) {
         clearTimeout(searchTimeout);
@@ -24,8 +23,44 @@ watch(searchQuery, (newQuery) => {
     
     searchTimeout = setTimeout(() => {
         debouncedSearchQuery.value = newQuery;
-    }, 300); // 300ms delay
+    }, 500); // 300ms delay
 });
+// -------------------------
+
+
+// --- DYNAMIC DATA MANAGEMENT ---
+// MODIFIED: Initialize transactions as an empty array
+const transactions = ref([]); 
+// ADDED: State for API call status
+const isLoading = ref(true); 
+const fetchError = ref(null); 
+
+// ADDED: Function to fetch data dynamically using Axios
+const fetchTransactions = async () => {
+    // 🚨 IMPORTANT: Replace this URL with your actual API endpoint
+    const API_URL = 'http://your-backend-api.com/transactions'; 
+
+    isLoading.value = true;
+    fetchError.value = null;
+
+    try {
+        const response = await axios.get(API_URL);
+        // Axios wraps the response data in the 'data' property
+        transactions.value = response.data; 
+    } catch (error) {
+        console.error("Failed to fetch transactions:", error);
+        fetchError.value = 'Failed to load transactions. Please check the network or API endpoint.';
+        transactions.value = [];
+    } finally {
+        isLoading.value = false;
+    }
+};
+
+// ADDED: Call the fetch function when the component is mounted
+onMounted(() => {
+    fetchTransactions();
+});
+// -------------------------------
 
 
 // Date - Changed to two reactive variables for the date range
@@ -49,15 +84,6 @@ const headers = [
     'Action'
 ];
 
-// NOTE: Added more diverse data for search/filter testing
-const transactions = ref([
-    { campusId: '202500001', studentName: 'John Doe', referenceCode: 'xyz123AFC', paymentMethod: 'Maya', transactionType: 'Tuition Fee', date: '07/23/2025', status: 'Posted', amount: 27500, yearLevel: 'First Year', schoolYear: '2025', course:"Computer Science"},
-    { campusId: '202500002', studentName: 'Jane Smith', referenceCode: 'abc987ZYX', paymentMethod: 'Gcash', transactionType: 'Books', date: '07/23/2025', status: 'Floating', amount: 5000, yearLevel: 'Second Year', schoolYear: '2025', course: 'Bachelor of Arts (Mass Communication)' },
-    { campusId: '202600010', studentName: 'Chris Johnson', referenceCode: 'DEF456GHI', paymentMethod: 'Bank', transactionType: 'Miscellaneous', date: '07/24/2025', status: 'Posted', amount: 1500, yearLevel: 'Third Year', schoolYear: '2026' , course: 'Bachelor of Science in Mathematics'  },
-    { campusId: '202500001', studentName: 'Bronny James', referenceCode: 'JKL012MNO', paymentMethod: 'Maya', transactionType: 'Tuition Fee', date: '07/25/2025', status: 'Floating', amount: 20000, yearLevel: 'First Year', schoolYear: '2025' , course: 'Bachelor of Arts in Psychology' },
-    { campusId: '202500001', studentName: 'Michael Williams', referenceCode: 'JKL012MNO', paymentMethod: 'Cash', transactionType: 'Tuition Fee', date: '09/30/2025', status: 'Floating', amount: 30000, yearLevel: 'Fourth Year', schoolYear: '2025' , course: 'BSIT' },
-]);
-
 // Helper function to convert the transaction date format ('MM/DD/YYYY') to a Date object
 const toDate = (dateString) => {
     const parts = dateString.split('/');
@@ -69,6 +95,9 @@ const toDate = (dateString) => {
 // COMPUTED PROPERTY FOR SORTING
 // =========================================================================
 const sortedTransactions = computed(() => {
+    // Only attempt to sort if data is present
+    if (!transactions.value.length) return [];
+    
     const list = [...transactions.value]; 
     
     list.sort((a, b) => {
@@ -212,7 +241,17 @@ const handleReportModalPrint = (details) => {
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="transaction in filteredTransactions" :key="transaction.referenceCode">
+                    <tr v-if="isLoading">
+                        <td :colspan="headers.length" class="px-4 py-8 text-center text-gray-500 text-base">
+                            Loading transactions...
+                        </td>
+                    </tr>
+                    <tr v-else-if="fetchError">
+                        <td :colspan="headers.length" class="px-4 py-8 text-center text-red-500 text-base">
+                            {{ fetchError }}
+                        </td>
+                    </tr>
+                    <tr v-else v-for="transaction in filteredTransactions" :key="transaction.referenceCode">
                         <TransactionDataCell :value="transaction.campusId" />
                         <TransactionDataCell :value="transaction.studentName" />
                         <TransactionDataCell :value="transaction.referenceCode" />
@@ -236,7 +275,7 @@ const handleReportModalPrint = (details) => {
 
                         </td>
                     </tr>
-                    <tr v-if="filteredTransactions.length === 0">
+                    <tr v-if="!isLoading && !fetchError && filteredTransactions.length === 0">
                         <td :colspan="headers.length" class="px-4 py-8 text-center text-gray-500 text-base">
                             No transactions found for the selected filter/date.
                         </td>

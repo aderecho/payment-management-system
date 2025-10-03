@@ -3,7 +3,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
-import PaymentCards from '@/Components/PaymentCards.vue'; 
+// import PaymentCards from '@/Components/PaymentCards.vue'; 
 import TransactionList from '@/Components/TransactionList.vue'; 
 
 const menuItems = [
