@@ -5,11 +5,12 @@ import NavHeader from '@/Components/NavHeader.vue';
 import Sidebar from '@/Components/Sidebar.vue';
 // import PaymentCards from '@/Components/PaymentCards.vue'; 
 import TransactionList from '@/Components/TransactionList.vue'; 
+// Note: SVG component is imported in Sidebar.vue
 
 const menuItems = [
-    { name: "Dashboard", icon: "fa-solid fa-table-cells-large", route: "/DashboardPage" },
-    { name: "Counter Payment", icon: "fa-solid fa-boxes-packing", route: "/CounterPaymentPage" },
-    { name: "Transaction Log", icon: "fa-solid fa-file-export", route: "/TransactionLogPage" },
+    { name: "Dashboard", icon: "Dashboard", route: "/DashboardPage" },
+    { name: "Counter Payment", icon: "Counter Payment", route: "/CounterPaymentPage" },
+    { name: "Transaction Log", icon: "Transaction Log", route: "/TransactionLogPage" },
 ];
 
 const isSidebarOpen = ref(false); 

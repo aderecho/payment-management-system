@@ -1,6 +1,8 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue';
 import { Link, usePage } from "@inertiajs/vue3";
+// ADDED: Import the SVG component
+import SVG from '@/Components/SVG.vue'; 
 
 const props = defineProps({
     menuItems: {
@@ -25,7 +27,7 @@ const isActive = (route) => page.url.startsWith(route);
     <aside 
         :class="[
             'bg-white shadow-lg transition-all duration-300 ease-in-out z-30',
-            // Use width classes for collapsed/expanded states (w-48 is 12rem, w-16 is 4rem)
+            // Use width classes for collapsed/expanded states
             props.isSidebarOpen ? 'w-49' : 'w-16', 
             'fixed top-16 bottom-0' 
         ]"
@@ -41,7 +43,10 @@ const isActive = (route) => page.url.startsWith(route);
                     :class="{'bg-[#D9D9D9]': isActive(item.route)}"
                     class="flex items-center gap-3 text-[#3A3434] py-4 px-4 mx-1 rounded-md hover:bg-[#D9D9D9] transition-colors duration-200"
                 >
-                    <i :class="[item.icon, 'text-base w-6 text-center']"></i>
+                    <SVG 
+                        :icon-name="item.icon" 
+                        container-class="w-6 h-6 text-[#3A3434] text-base"
+                    />
                     
                     <span 
                         :class="{'opacity-100 max-w-xs': isSidebarOpen, 'opacity-0 max-w-0': !isSidebarOpen}"
