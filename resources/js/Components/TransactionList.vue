@@ -201,35 +201,53 @@ const handleReportModalPrint = (details) => {
 <template>
     <div class="bg-white p-5 rounded-lg shadow-xl">
 
-        <div class="flex  items-center justify-end gap-4 mb-4">
-             <h1 class="text-2xl font-bold text-gray-800 shrink-0">Transaction List</h1>
-            
-            <div class="flex items-center gap-3 flex-grow justify-end min-w-0 ">
-                <label for="start-date" class="text-sm font-medium text-gray-600">From:</label>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6 px-4">
+    <h1 class="text-3xl font-extrabold text-gray-900 leading-tight shrink-0">Transaction List</h1> 
+
+    <div class="flex flex-wrap items-end gap-x-4 gap-y-3 flex-grow justify-end min-w-0">
+        <div class="flex flex-col items-start min-w-[140px]">
+            <label for="start-date" class="text-xs font-semibold text-gray-700 mb-1">From</label>
+            <div class="relative w-full">
                 <input 
                     type="date" 
                     id="start-date" 
                     v-model="startDate" 
-                    class="p-1.5 border border-gray-300 rounded-lg text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
+                    aria-label="Start Date"
                 >
+                <i class="fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
             </div>
-            
-            <div class="flex items-center space-x-2">
-                <label for="end-date" class="text-sm font-medium text-gray-600">To:</label>
+        </div>
+        
+        <div class="flex flex-col items-start min-w-[140px]">
+            <label for="end-date" class="text-xs font-semibold text-gray-700 mb-1">To</label>
+            <div class="relative w-full">
                 <input 
                     type="date" 
                     id="end-date" 
                     v-model="endDate" 
-                    :min="startDate" class="p-1.5 border border-gray-300 rounded-lg text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500"
+                    :min="startDate" 
+                    class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
+                    aria-label="End Date"
                 >
+                <i class=" fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
             </div>
-
-            <div class="relative flex-grow max-w-xs">
-                <input type="search" v-model="searchQuery" placeholder="Search Campus ID, Name, Ref Code..." class="p-1.5 pl-3 border border-gray-300 rounded-lg w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500">
-                <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-            </div>
-
         </div>
+
+        <div class="relative flex-grow max-w-[250px] sm:max-w-xs md:max-w-[300px]">
+             <label for="search-input" class="sr-only">Search Transactions</label>
+            <input 
+                type="search" 
+                id="search-input"
+                v-model="searchQuery" 
+                placeholder="Search by ID, Name, Ref Code..." 
+                class="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200"
+                aria-label="Search transactions"
+            >
+            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+    </div>
+</div>
 
         <div class="overflow-x-auto border border-gray-200 rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
