@@ -17,7 +17,11 @@ const statusClasses = computed(() => {
         case 'Floating':
             // Orange badge
             return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-200 text-yellow-800';
-        default:
+        case 'Cancelled':
+            // Red  badge
+            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-200 text-yellow-800';
+        
+         default:
             // Default/Gray badge
             return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-800';
     }

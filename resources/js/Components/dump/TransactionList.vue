@@ -67,6 +67,21 @@ onMounted(() => {
 const startDate = ref('');
 const endDate = ref('');
 //Payment Details Modal
+
+// **************************** ADDED CODE START (Today's Date) ****************************
+/**
+ * Computed property to get today's date formatted as YYYY-MM-DD.
+ * This is used to set the 'max' attribute on the date inputs, preventing future dates.
+ */
+const todayDateString = computed(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+});
+// **************************** ADDED CODE END (Today's Date) ****************************
+
 const showDetailsModal = ref(false); // State to control modal visibility
 const selectedTransaction = ref({}); // State to hold the data for the modal
 //Reports Modal
@@ -212,7 +227,7 @@ const handleReportModalPrint = (details) => {
                     type="date" 
                     id="start-date" 
                     v-model="startDate" 
-                    class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
+                    :max="todayDateString" class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
                     aria-label="Start Date"
                 >
                 <i class="fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -227,7 +242,7 @@ const handleReportModalPrint = (details) => {
                     id="end-date" 
                     v-model="endDate" 
                     :min="startDate" 
-                    class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
+                    :max="todayDateString" class="appearance-none pr-3 pl-3 py-2 border border-gray-300 rounded-md w-full text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-200 cursor-pointer"
                     aria-label="End Date"
                 >
                 <i class=" fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -288,7 +303,7 @@ const handleReportModalPrint = (details) => {
                             </button>
 
                            <button @click="openReportsModal(transaction)" class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
-    Report <i class="fa-solid fa-file-invoice ml-1"></i>
+    Update <i class="fas fa-edit ml-1"></i>
 </button>
 
                         </td>
@@ -302,7 +317,7 @@ const handleReportModalPrint = (details) => {
             </table>
         </div>
     </div>
-         <PaymentDetailsModal 
+           <PaymentDetailsModal 
         :show="showDetailsModal" 
         :paymentDetails="selectedTransaction" 
         @close="closePaymentDetailsModal"

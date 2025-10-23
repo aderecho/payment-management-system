@@ -3,8 +3,9 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
+import TransactionMockData from '@/Components/TransactionMockData.vue';
 // import PaymentCards from '@/Components/PaymentCards.vue'; 
-import TransactionList from '@/Components/TransactionList.vue'; 
+// import TransactionList from '@/Components/dump/TransactionList.vue';  Import with axios
 // Note: SVG component is imported in Sidebar.vue
 
 const menuItems = [
@@ -61,8 +62,9 @@ const closeSidebarOnLeave = () =>{
                 'ml-[4.5rem]': !isSidebarOpen 
             }">
 
-            
-            <TransactionList />
+    
+            <!-- <TransactionList /> -->
+            <TransactionMockData />
         </main>
         
     </div>

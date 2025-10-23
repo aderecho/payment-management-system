@@ -1,5 +1,6 @@
 <script setup>
 import { defineProps, defineEmits, computed, ref } from 'vue'; // 👈 Import 'ref' for template reference
+import '@fortawesome/fontawesome-free/css/all.min.css'; 
 
 // Define the template reference for the printable area
 const printContentRef = ref(null);
@@ -86,9 +87,9 @@ const detailItems = computed(() => [
 </script>
 
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50">
+    <div v-if="show" class=" fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50">
         
-        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100">
+        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[36rem]">
             
             <div class="flex justify-between items-center mb-6 pb-2 border-b no-print">
                 <h3 class="text-xl font-bold text-gray-800">Payment Details</h3>
@@ -114,7 +115,7 @@ const detailItems = computed(() => [
                                 'bg-green-200 text-green-800': paymentDetails.status === 'Posted',
                                 'bg-yellow-200 text-yellow-800': paymentDetails.status === 'Floating',
                                 'bg-red-200 text-red-800': paymentDetails.status === 'Cancelled',
-                                'bg-gray-200 text-gray-800': !paymentDetails.status
+                                'bg-gray-200 text-gray-800': paymentDetails.status === 'Pending',
                             }"
                             class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold status-badge"
                         >
@@ -130,10 +131,10 @@ const detailItems = computed(() => [
 
             </div>
             
-            <div class="mt-8 flex justify-end no-print">
+            <div class="mt-5 flex justify-end no-print">
                 <button 
                     @click="handlePrint" 
-                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-md font-semibold"
+                    class="px-6 py-2  bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-md font-semibold"
                 >
                     Print Payment 
                     <i class="fa-solid fa-print ml-2"></i>

@@ -3,7 +3,7 @@ import { ref, defineEmits } from 'vue';
 
 const emit = defineEmits(['toggleSidebar']);
 
-const upLogoPath = "/images/UP-Seal.png";
+const upLogoPath = "/images/UPC-WEBSITE-HEADER.png";
 const userAvatarUrl = ref('/images/default_avatar.jpg'); 
 </script>
 <template>
@@ -22,7 +22,7 @@ const userAvatarUrl = ref('/images/default_avatar.jpg');
         ></i>
         
         <img 
-            class="w-[48px] h-[48px] object-cover" 
+            class="w-15.625 h-12 object-cover" 
             :src="upLogoPath" 
             alt="UP Seal Logo"
         >
