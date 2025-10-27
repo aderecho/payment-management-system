@@ -1,164 +1,24 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios'; 
-
 //Transaction Table import
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
-
 //Modals
 import PaymentDetailsModal from './PaymentDetailsModal.vue';
 import StatusUpdateModal from './StatusUpdateModal.vue';
-// Create confirmation Modal before updating the STATUS
 import ConfirmationModal from './ConfirmationModal.vue'; 
-
 //DatePicker Component
 import DatePicker from './DatePicker.vue'; 
+import SVG from './SVG.vue';
+//Mock Data
+import { MOCK_TRANSACTION_DATA } from '@/MockData.js'; 
 
 
 // --- MOCK USER/TRANSACTION DATA ---
-const MOCK_TRANSACTION_DATA = [
-    {
-        campusId: 'C1001',
-        studentName: 'Alice Johnson',
-        referenceCode: 'REF-001234',
-        paymentMethod: 'Bank',
-        transactionType: 'Tuition Fee',
-        amount: 25000.00,
-        date: '10/05/2025', // MM/DD/YYYY format
-        status: 'Posted',
-        course: 'BS Computer Science',
-        yearLevel: '4th Year', 
-        schoolYear: '2025-2026', 
-        details: 'Full tuition payment for Fall 2025 semester.',
-        processedBy: 'Admin User 1'
-    },
-    {
-        campusId: 'C1005',
-        studentName: 'Bob Smith',
-        referenceCode: 'REF-001235',
-        paymentMethod: 'Cash', // Matches "Cash"
-        transactionType: 'Miscellanous Fee',
-        amount: 550.50,
-        date: '10/04/2025',
-        status: 'Floating',
-        course: 'BA English Literature',
-        yearLevel: '2nd Year', 
-        schoolYear: '2025-2026', 
-        details: 'Payment for library late return fees.',
-        processedBy: 'Admin User 2'
-    },
-    {
-        campusId: 'C1010',
-        studentName: 'Charlie Brown',
-        referenceCode: 'REF-001236',
-        paymentMethod: 'Bank',
-        transactionType: 'Tuition Fee',
-        amount: 15000.00,
-        date: '10/03/2025',
-        status: 'Cancelled',
-        course: 'BSc Biology',
-        yearLevel: '3rd Year', 
-        schoolYear: '2024-2025', 
-        details: 'Partial tuition fee payment.',
-        processedBy: 'Admin User 3'
-    },
-    
-    {
-        campusId: 'C1022',
-        studentName: 'Dana Scully',
-        referenceCode: 'REF-001237',
-        paymentMethod: 'Maya',
-        transactionType: 'Books',
-        amount: 1200.75,
-        date: '09/30/2025',
-        status: 'Pending',
-        course: 'MS Physics',
-        yearLevel: '1st Year Grad', 
-        schoolYear: '2025-2026', 
-        details: 'Purchase of required textbooks.',
-        processedBy: 'Admin User 1'
-    },
-    {
-        campusId: 'C1033',
-        studentName: 'Fox Mulder',
-        referenceCode: 'REF-001238',
-        paymentMethod: 'Gcash', // Should NOT match "Cash"
-        transactionType: 'Tuition Fee',
-        amount: 8000.00,
-        date: '09/28/2025',
-        status: 'Posted',
-        course: 'PhD Paranormal Studies',
-        yearLevel: '2nd Year Grad', 
-        schoolYear: '2025-2026', 
-        details: 'Installment payment.',
-        processedBy: 'Admin User 4'
-    },
-    {
-        campusId: 'C1044',
-        studentName: 'Eliza Thorne',
-        referenceCode: 'REF-001239',
-        paymentMethod: 'Bank',
-        transactionType: 'Tuition Fee',
-        amount: 32000.00,
-        date: '08/15/2025', // August 2025
-        status: 'Pending',
-        course: 'BFA Digital Arts',
-        yearLevel: '1st Year', 
-        schoolYear: '2025-2026', 
-        details: 'Full tuition for the academic year.',
-        processedBy: 'Admin User 5'
-    },
-    {
-        campusId: 'C1055',
-        studentName: 'Gary Oldman',
-        referenceCode: 'REF-001240',
-        paymentMethod: 'Cash',
-        transactionType: 'ID Replacement',
-        amount: 350.00,
-        date: '10/20/2025', // Latest Date
-        status: 'Floating',
-        course: 'BS Chemistry',
-        yearLevel: '3rd Year', 
-        schoolYear: '2025-2026', 
-        details: 'Fee for new student ID card.',
-        processedBy: 'Admin User 2'
-    },
-    
-    {
-        campusId: 'C1077',
-        studentName: 'Ian Malcolm',
-        referenceCode: 'REF-001242',
-        paymentMethod: 'Gcash',
-        transactionType: 'Dormitory Fee',
-        amount: 9500.00,
-        date: '07/10/2025',
-        status: 'Cancelled',
-        course: 'PhD Mathematics',
-        yearLevel: '3rd Year Grad', 
-        schoolYear: '2025-2026', 
-        details: 'Monthly dormitory payment (later cancelled).',
-        processedBy: 'Admin User 1'
-    },
-    {
-        campusId: 'C1088',
-        studentName: 'Jane Foster',
-        referenceCode: 'REF-001243',
-        paymentMethod: 'Maya',
-        transactionType: 'Tuition Fee',
-        amount: 18000.00,
-        date: '09/01/2025',
-        status: 'Cancelled',
-        course: 'MS Astrophysics',
-        yearLevel: '1st Year Grad', 
-        schoolYear: '2025-2026', 
-        details: 'Second tuition installment.',
-        processedBy: 'Admin User 4'
-    },
 
-];
 // ---------------------------------
-
+const mockTransactions = MOCK_TRANSACTION_DATA;
 
 // --- DYNAMIC DATA MANAGEMENT (Mock Data Loading) ---
 const transactions = ref([]); 
@@ -260,7 +120,7 @@ const displayDate = (dateModel) => {
 // Modal States
 const showDetailsModal = ref(false); 
 const selectedTransaction = ref({}); 
-const showReportsModal = ref(false); 
+const showStatusUpdateModal = ref(false); 
 const selectedReportTransaction = ref({}); 
 
 // NEW: State for Confirmation/Toast
@@ -269,6 +129,7 @@ const confirmationMessage = ref('');
 const transactionToUpdate = ref(null); // Stores the transaction details before the final update
 
 const headers = [
+    'OR No.',
     'Campus Id',
     'Student Name',
     'Reference Code',
@@ -332,21 +193,15 @@ const filteredTransactions = computed(() => {
         const isCashSearch = query === 'cash';
 
         results = results.filter(transaction => {
-            // Special case for "cash"
+            
+            // 1. Specific handling for the EXACT query 'cash'
             if (isCashSearch) {
-                // Only match if paymentMethod is EXACTLY 'Cash'
-                if (transaction.paymentMethod.toLowerCase() === 'cash') {
-                    return true;
-                }
+                // Return TRUE only if the paymentMethod is EXACTLY 'Cash' (case-insensitive)
+                return transaction.paymentMethod.toLowerCase() === 'cash';
             }
             
-            // General search logic (for all other fields/queries)
+            // 2. General search logic (for all other fields/queries)
             return Object.values(transaction).some(val => {
-                // If it's the cash search, skip checking paymentMethod here
-                if (isCashSearch && String(val).toLowerCase() === 'cash') {
-                    return false; // Already handled, or prevent re-checking
-                }
-                
                 // Standard includes check for all other fields/queries
                 return String(val).toLowerCase().includes(query);
             });
@@ -380,7 +235,7 @@ const formatCurrency = (amount) => {
 
 
 // =========================================================================
-// MODAL AND UPDATE LOGIC (Already correct from previous step)
+// MODAL AND UPDATE LOGIC
 // =========================================================================
 
 // Modal Functions (Keep existing)
@@ -399,17 +254,17 @@ const handleModalPrint = (details) => {
     alert(`Initiating print for transaction: ${details.referenceCode}`);
 };
 
-const openReportsModal = (transaction) => {
+const openStatusUpdateModal = (transaction) => {
     selectedReportTransaction.value = {
         ...transaction,
         studentName: transaction.studentName,
         course: transaction.course || 'N/A', 
     };
-    showReportsModal.value = true;
+    showStatusUpdateModal.value = true;
 };
 
-const closeReportsModal = () => {
-    showReportsModal.value = false;
+const closeStatusUpdateModal = () => {
+    showStatusUpdateModal.value = false;
     selectedReportTransaction.value = {};
     transactionToUpdate.value = null; // Clear update data
 };
@@ -418,17 +273,19 @@ const closeReportsModal = () => {
 const handleStatusUpdate = (details) => {
     // 1. Store the details from the modal and close the modal
     transactionToUpdate.value = details;
-    closeReportsModal();
+    closeStatusUpdateModal();
 
     // Confirmation Modal
-    confirmationMessage.value = `Confirm update status for ${details.studentName} (Ref: ${details.referenceCode}) to **${details.editableStatus}**?`;
+    // NOTE: The modal should pass the newStatus, assuming StatusUpdateModal was also updated
+    confirmationMessage.value = `Confirm update status for ${details.studentName} (Ref: ${details.referenceCode}) to **${details.newStatus}**?`;
     showConfirmationModal.value = true;
 };
 
 const confirmUpdate = () => {
     if (!transactionToUpdate.value) return;
 
-    const { referenceCode, editableStatus } = transactionToUpdate.value;
+    // Use 'newStatus' from the emitted payload
+    const { referenceCode, newStatus } = transactionToUpdate.value; 
 
     // 1. Find the index of the transaction to update
     const index = transactions.value.findIndex(t => t.referenceCode === referenceCode);
@@ -436,15 +293,15 @@ const confirmUpdate = () => {
     if (index !== -1) {
         // 2. Update the status on the local reactive array
         // NOTE: This uses the direct index to ensure reactivity.
-        transactions.value[index].status = editableStatus;
+        transactions.value[index].status = newStatus;
         
         // 3. Save the updated mock data to local storage for persistence (optional mock-persistence)
         localStorage.setItem('mockTransactions', JSON.stringify(transactions.value));
 
-        console.log(`Status of ${referenceCode} updated to ${editableStatus}`);
+        console.log(`Status of ${referenceCode} updated to ${newStatus}`);
 
         // 4. Optionally provide user feedback (e.g., a simple alert or a toast)
-        alert(`SUCCESS: Transaction ${referenceCode} is now ${editableStatus}.`);
+        alert(`SUCCESS: Transaction ${referenceCode} is now ${newStatus}.`);
 
     } else {
         alert(`ERROR: Could not find transaction with reference code ${referenceCode}.`);
@@ -462,10 +319,10 @@ const cancelUpdate = () => {
 };
 
 // --- Keep existing print handler for the Report Modal (from StatusUpdateModal) ---
-const handleReportModalPrint = (details) => {
-    console.log("Parent received print request for report:", details.referenceCode);
-    // The actual printing logic is handled inside StatusUpdateModal via handlePrint
-};
+// const handleReportModalPrint = (details) => {
+//     console.log("Parent received print request for report:", details.referenceCode);
+//     // The actual printing logic is handled inside StatusUpdateModal via handlePrint
+// };
 
 
 </script>
@@ -473,7 +330,7 @@ const handleReportModalPrint = (details) => {
 <template>
     <div class="bg-white p-5 rounded-lg shadow-xl">
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6 px-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2  mt-0.1">
             <h1 class="text-3xl font-extrabold text-gray-900 leading-tight shrink-0">Transaction List</h1> 
 
             <div class="flex flex-wrap items-end gap-x-4 gap-y-3 flex-grow justify-end min-w-0">
@@ -558,7 +415,8 @@ const handleReportModalPrint = (details) => {
                             {{ fetchError }}
                         </td>
                     </tr>
-                    <tr v-else v-for="transaction in filteredTransactions" :key="transaction.referenceCode">
+                    <tr v-else v-for="(transaction, index) in filteredTransactions" :key="transaction.referenceCode">
+                        <TransactionDataCell :value="index + 1" />
                         <TransactionDataCell :value="transaction.campusId" />
                         <TransactionDataCell :value="transaction.studentName" />
                         <TransactionDataCell :value="transaction.referenceCode" />
@@ -578,7 +436,7 @@ const handleReportModalPrint = (details) => {
                             </button>
 
                             <button 
-                                @click="openReportsModal(transaction)" 
+                                @click="openStatusUpdateModal(transaction)" 
                                 class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
                                 Update <i class="fa-solid fas fa-edit ml-1"></i>
                             </button>
@@ -594,10 +452,15 @@ const handleReportModalPrint = (details) => {
                 
             </table>
         </div>
-    </div>
-    
-
-    
+        
+            <div class="flex justify-end mt-3.5">
+                <button class="flex items-center rounded-lg shadow-lg py-1 px-3 bg-brand-maroon hover:bg-brand-maroon-hover text-white text-xs font-semibold transition duration-150">
+                     <span>Generate Report</span>
+                     <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"/>
+                </button>
+             </div>
+         </div>
+           
     <PaymentDetailsModal 
         :show="showDetailsModal" 
         :paymentDetails="selectedTransaction" 
@@ -606,11 +469,11 @@ const handleReportModalPrint = (details) => {
     />
 
     <StatusUpdateModal 
-        :show="showReportsModal" 
-        :reportDetails="selectedReportTransaction" 
-        @close="closeReportsModal"
-        @confirm-update="handleStatusUpdate"
-        @print="handleReportModalPrint" />
+        :show="showStatusUpdateModal" 
+        :statusDetails="selectedReportTransaction" 
+        @close="closeStatusUpdateModal"
+        @confirm-update="handleStatusUpdate"/>
+        <!-- @print="handleReportModalPrint"  -->
 
     <ConfirmationModal
         :show="showConfirmationModal"

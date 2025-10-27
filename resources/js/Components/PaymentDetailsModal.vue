@@ -17,6 +17,7 @@ const props = defineProps({
         default: () => ({
             campusId: '',
             studentName: '',
+            email: '',
             course: '',
             yearLevel: '',
             schoolYear: '',
@@ -76,6 +77,7 @@ const formatAmount = (amount) => {
 const detailItems = computed(() => [
     { key: 'Campus ID', value: props.paymentDetails.campusId },
     { key: 'Name', value: props.paymentDetails.studentName },
+    { key: 'Email', value: props.paymentDetails.email },
     { key: 'Course', value: props.paymentDetails.course },
     { key: 'Year Level', value: props.paymentDetails.yearLevel },
     { key: 'School Year', value: props.paymentDetails.schoolYear },
@@ -87,18 +89,18 @@ const detailItems = computed(() => [
 </script>
 
 <template>
-    <div v-if="show" class=" fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50">
+    <div v-if="show" class=" fixed inset-0 z-50 flex items-center justify-center p-1 bg-gray-900 bg-opacity-50">
         
-        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[36rem]">
+        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[34rem]">
             
-            <div class="flex justify-between items-center mb-6 pb-2 border-b no-print">
+            <div class="flex justify-between items-center mb-1 pb-2 border-b no-print">
                 <h3 class="text-xl font-bold text-gray-800">Payment Details</h3>
                 <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
 
-            <h3 class="no-print:hidden text-2xl font-bold text-gray-800 text-center mb-6">Payment Details Receipt</h3>
+            <h3 class="no-print:hidden text-2xl font-bold text-gray-800 text-center mb-2">Payment Details Receipt</h3>
             
             <div class="space-y-3 text-sm text-gray-700">
                 
@@ -131,10 +133,10 @@ const detailItems = computed(() => [
 
             </div>
             
-            <div class="mt-5 flex justify-end no-print">
+            <div class="mt-1.5 flex justify-end no-print">
                 <button 
                     @click="handlePrint" 
-                    class="px-6 py-2  bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-md font-semibold"
+                    class="px-3 py-1.5 mb-2 text-sm  bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-md font-semibold"
                 >
                     Print Payment 
                     <i class="fa-solid fa-print ml-2"></i>

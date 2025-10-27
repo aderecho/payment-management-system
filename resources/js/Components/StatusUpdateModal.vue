@@ -11,11 +11,12 @@ const props = defineProps({
         required: true
     },
     // Data to display in the modal, matching the fields in the image
-    reportDetails: { // Renamed prop to reportDetails for clarity
+    statusDetails: { // Renamed prop to statusDetails for clarity
         type: Object,
         default: () => ({
             campusId: '',
-            studentName: '', // Assuming studentName is passed, as in your transaction data
+            studentName: '', 
+            email: '',
             course: '',
             yearLevel: '',
             schoolYear: '',
@@ -33,13 +34,13 @@ const props = defineProps({
 const emit = defineEmits(['close', 'print', 'update-status']); 
 
 // Reactive variable for the status dropdown
-const editableStatus = ref(props.reportDetails.status);
+const editableStatus = ref(props.statusDetails.status);
 
 // List of available status options
 const statusOptions = ['Pending', 'Floating', 'Posted', 'Cancelled'];
 
 // Watch the prop status and update the local editable status when the modal opens/data changes
-watch(() => props.reportDetails.status, (newStatus) => {
+watch(() => props.statusDetails.status, (newStatus) => {
     editableStatus.value = newStatus;
 });
 
@@ -47,9 +48,9 @@ watch(() => props.reportDetails.status, (newStatus) => {
 watch(editableStatus, (newStatus) => {
     // Only emit if the status has actually changed from the prop's initial value
     // This assumes the parent component will handle the API call to persist the change
-    if (newStatus !== props.reportDetails.status) {
+    if (newStatus !== props.statusDetails.status) {
         emit('update-status', { 
-            referenceCode: props.reportDetails.referenceCode,
+            referenceCode: props.statusDetails.referenceCode,
             newStatus: newStatus 
         });
     }
@@ -103,8 +104,8 @@ const handlePrint = () => {
         console.error("Print area not found.");
     }
 
-    emit('print', props.reportDetails); // Still emit for parent tracking
-    console.log("Printing report initiated for:", props.reportDetails.referenceCode);
+    emit('print', props.statusDetails); // Still emit for parent tracking
+    console.log("Printing report initiated for:", props.statusDetails.referenceCode);
 };
 
 // Helper function to format the amount
@@ -115,30 +116,31 @@ const formatAmount = (amount) => {
 
 // Computed property for the detail items to ensure reactivity
 const detailItems = computed(() => [
-    { key: 'Campus ID', value: props.reportDetails.campusId },
-    { key: 'Name', value: props.reportDetails.studentName },
-    { key: 'Course', value: props.reportDetails.course || 'N/A' }, // Added fallback for missing course data
-    { key: 'Year Level', value: props.reportDetails.yearLevel },
-    { key: 'School Year', value: props.reportDetails.schoolYear },
-    { key: 'Reference Code', value: props.reportDetails.referenceCode },
-    { key: 'Payment Method', value: props.reportDetails.paymentMethod },
-    { key: 'Transaction Type', value: props.reportDetails.transactionType },
-    { key: 'Date', value: props.reportDetails.date },
+    { key: 'Campus ID', value: props.statusDetails.campusId },
+    { key: 'Name', value: props.statusDetails.studentName },
+    { key: 'Email', value: props.statusDetails.email },
+    { key: 'Course', value: props.statusDetails.course || 'N/A' }, // Added fallback for missing course data
+    { key: 'Year Level', value: props.statusDetails.yearLevel },
+    { key: 'School Year', value: props.statusDetails.schoolYear },
+    { key: 'Reference Code', value: props.statusDetails.referenceCode },
+    { key: 'Payment Method', value: props.statusDetails.paymentMethod },
+    { key: 'Transaction Type', value: props.statusDetails.transactionType },
+    { key: 'Date', value: props.statusDetails.date },
 ]);
 </script>
 <template>
-    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900 bg-opacity-50">
+    <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-1 bg-gray-900 bg-opacity-50">
         
-        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 md:h-[36rem]">
+        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6  transform transition-all duration-300 scale-100 opacity-100 md:h-[34rem]">
             
-            <div class="flex justify-between items-center mb-6 pb-2 border-b no-print">
+            <div class="flex justify-between items-center mb-1 pb-2 border-b no-print">
                 <h3 class="text-xl font-bold text-gray-800">Status</h3> 
                 <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
             </div>
 
-            <h3 class="no-print:hidden text-2xl font-bold text-gray-800 text-center mb-6">Update Status</h3>
+            <h3 class="no-print:hidden text-2xl font-bold text-gray-800 text-center mb-1">Update Status</h3>
             
             <div class="space-y-3 text-sm text-gray-700">
                 
@@ -184,28 +186,28 @@ const detailItems = computed(() => [
 <p class="text-right hidden no-print:inline">
                         <span 
                             :class="{
-                                'bg-green-200 text-green-800': reportDetails.status === 'Posted',
-                                'bg-yellow-200 text-yellow-800': reportDetails.status === 'Floating', // Only Floating is Yellow
-                                'bg-gray-200 text-gray-800': reportDetails.status === 'Pending', // 👈 Pending is Gray
-                                'bg-red-200 text-red-800': reportDetails.status === 'Cancelled',
+                                'bg-green-200 text-green-800': statusDetails.status === 'Posted',
+                                'bg-yellow-200 text-yellow-800': statusDetails.status === 'Floating', // Only Floating is Yellow
+                                'bg-gray-200 text-gray-800': statusDetails.status === 'Pending', // 👈 Pending is Gray
+                                'bg-red-200 text-red-800': statusDetails.status === 'Cancelled',
                             }"
                             class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold status-badge"
                         >
-                            {{ reportDetails.status || 'N/A' }}
+                            {{ statusDetails.status || 'N/A' }}
                         </span>
                     </p>
                 </div>
 
                 <div class="flex justify-between pt-2 detail-row">
                     <p class="font-bold mr-4 key">Amount:</p>
-                    <p class="font-bold text-lg text-gray-900 amount-value">{{ formatAmount(reportDetails.amount) }}</p>
+                    <p class="font-bold text-lg text-gray-900 amount-value">{{ formatAmount(statusDetails.amount) }}</p>
                 </div>
 
             </div>
             
             <div class="mt-5 flex justify-end">
                 <button 
-                        @click="$emit('confirm-update', reportDetails)"
+                        @click="$emit('confirm-update', statusDetails)"
                         class="bg-custom-green-dark hover:bg-custom-green-dark-hover text-white text-xs font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition duration-150"
                         >
                         Update 

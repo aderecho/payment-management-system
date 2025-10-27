@@ -17,17 +17,19 @@ export default {
             },
             colors: {
                 // Existing Custom Green
-                'custom-green-dark': {
+                'brand-green-dark': {
                     DEFAULT: '#00573F', 
                     'hover': '#00402E',
                 },
-                
+                // Maroon	#8A1538	bg-brand-maroon
+                // Maroon Hover	#6E112D	hover:bg-brand-maroon-hover
                 // New Custom Color: #8A1538 (Maroon)
                 'brand-maroon': {
                     DEFAULT: '#8A1538',
                     'hover': '#6E112D', // Slightly darker for hover
                 },
-                
+                // Gold	#FFB81C	text-brand-gold
+                // Gold Hover	#CC9316	hover:bg-brand-gold-hover
                 // New Custom Color: #FFB81C (Gold/Yellow)
                 'brand-gold': {
                     DEFAULT: '#FFB81C',
@@ -39,3 +41,5 @@ export default {
 
     plugins: [forms],
 };
+
+

@@ -6,21 +6,21 @@ const cardData = ref([
         title: "Student University Enrollment Related",
         value: "45,678.90",
         percentageChange: "-20% month over month",
-        headerBgColor: "bg-[#8a1538]", // Maroon
+        headerBgColor: "bg-brand-maroon", // Maroon
         percentageColor: "text-red-600" // Adjusted for better visibility on white background
     },
     {
         title: "Library-Fees and Fines",
         value: "2,405",
         percentageChange: "+33% month over month",
-        headerBgColor: "bg-[#0f6b4d]", // Dark Green
+        headerBgColor: "bg-brand-green-dark", // Dark Green
         percentageColor: "text-green-600" // Adjusted for better visibility on white background
     },
     {
         title: "Facilities, Equipments & Vehicle Registration",
         value: "10,353",
         percentageChange: "-8% month over month",
-        headerBgColor: "bg-[#ffae1a]", // Yellow/Orange
+        headerBgColor: "bg-brand-gold", // Yellow/Orange
         percentageColor: "text-red-600" // Adjusted for better visibility on white background
     },
 ]);
@@ -34,7 +34,7 @@ const cardData = ref([
             :key="card.title"
             class="shadow-xl rounded-lg overflow-hidden" 
         >
-            <div :class="card.headerBgColor" class="p-4 text-white text-md  font-semibold rounded-t-lg">
+            <div :class="card.headerBgColor" class="p-4 text-white text-sm  font-semibold rounded-t-lg">
                 {{ card.title }}
             </div>
 
