@@ -25,7 +25,7 @@ const props = defineProps({
             paymentMethod: '',
             transactionType: '',
             date: '',
-            status: '',
+            // status: '',
             amount: 0,
         })
     }
@@ -44,7 +44,7 @@ const handlePrint = () => {
 
         // 2. Write the content of the print area to the new window's document
         // We include a basic HTML structure and some inline styles to ensure readability
-        newwin.document.write('<html><head><title>Payment Receipt</title>');
+        newwin.document.write('<html><head><title>University of the Philippines Cebu</title>');
         // Optional: Include any necessary CSS for the printed page here
         newwin.document.write('<style>body { font-family: sans-serif; padding: 20px; } .print-area { max-width: 400px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; } h3 { text-align: center; margin-bottom: 20px; } .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; } .key { font-weight: bold; margin-right: 15px; } .status-badge { display: inline-block; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; } .bg-green-200 { background-color: #d1fae5; color: #065f46; } .bg-yellow-200 { background-color: #fef3c7; color: #92400e; } .amount-value { font-size: 1.25rem; font-weight: bold; } @media print { .no-print { display: none; } }</style>');
         newwin.document.write('</head><body>');
@@ -56,7 +56,7 @@ const handlePrint = () => {
         newwin.print();
 
         // 4. Close the new window (usually after the print dialog is closed)
-        // newwin.close(); // You might comment this out to let the user review the print preview
+        //  newwin.close(); // You might comment this out to let the user review the print preview
         
     } else {
         console.error("Print area not found.");
@@ -91,10 +91,10 @@ const detailItems = computed(() => [
 <template>
     <div v-if="show" class=" fixed inset-0 z-50 flex items-center justify-center p-1 bg-gray-900 bg-opacity-50">
         
-        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[34rem]">
+        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[32rem]">
             
             <div class="flex justify-between items-center mb-1 pb-2 border-b no-print">
-                <h3 class="text-xl font-bold text-gray-800">Payment Details</h3>
+                <h3 class="text-xl font-bold text-gray-800">University of the Philippines Cebu</h3>
                 <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 transition">
                     <i class="fa-solid fa-times text-xl"></i>
                 </button>
@@ -109,7 +109,7 @@ const detailItems = computed(() => [
                     <p class="text-right">{{ item.value }}</p>
                 </div>
                 
-                <div class="flex justify-between detail-row">
+                <!-- <div class="flex justify-between detail-row">
                     <p class="font-bold mr-4 key">Status:</p>
                     <p class="text-right">
                         <span 
@@ -124,7 +124,7 @@ const detailItems = computed(() => [
                             {{ paymentDetails.status || 'N/A' }}
                         </span>
                     </p>
-                </div>
+                </div> -->
 
                 <div class="flex justify-between pt-2 detail-row">
                     <p class="font-bold mr-4 key">Amount:</p>

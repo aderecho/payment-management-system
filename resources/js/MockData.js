@@ -5,7 +5,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1001',
         studentName: 'Alice Johnson',
-        Email: 'alice.johnson@university.edu', 
+        email: 'alice.johnson@university.edu', 
         referenceCode: 'REF-001234',
         paymentMethod: 'Bank',
         transactionType: 'Tuition Fee',
@@ -21,7 +21,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1005',
         studentName: 'Bob Smith',
-        Email: 'bob.smith@university.edu', // ADDED
+        email: 'bob.smith@university.edu', // ADDED
         referenceCode: 'REF-001235',
         paymentMethod: 'Cash', // Matches "Cash"
         transactionType: 'Miscellanous Fee',
@@ -37,7 +37,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1010',
         studentName: 'Charlie Brown',
-        Email: 'charlie.brown@university.edu', // ADDED
+        email: 'charlie.brown@university.edu', // ADDED
         referenceCode: 'REF-001236',
         paymentMethod: 'Bank',
         transactionType: 'Tuition Fee',
@@ -54,7 +54,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1022',
         studentName: 'Dana Scully',
-        Email: 'dana.scully@university.edu', // ADDED
+        email: 'dana.scully@university.edu', // ADDED
         referenceCode: 'REF-001237',
         paymentMethod: 'Maya',
         transactionType: 'Books',
@@ -70,7 +70,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1033',
         studentName: 'Fox Mulder',
-        Email: 'fox.mulder@university.edu', // ADDED
+        email: 'fox.mulder@university.edu', // ADDED
         referenceCode: 'REF-001238',
         paymentMethod: 'Gcash', // Should NOT match "Cash"
         transactionType: 'Tuition Fee',
@@ -86,7 +86,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1044',
         studentName: 'Eliza Thorne',
-        Email: 'eliza.thorne@university.edu', // ADDED
+        email: 'eliza.thorne@university.edu', // ADDED
         referenceCode: 'REF-001239',
         paymentMethod: 'Bank',
         transactionType: 'Tuition Fee',
@@ -102,7 +102,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1055',
         studentName: 'Gary Oldman',
-        Email: 'gary.oldman@university.edu', // ADDED
+        email: 'gary.oldman@university.edu', // ADDED
         referenceCode: 'REF-001240',
         paymentMethod: 'Cash',
         transactionType: 'ID Replacement',
@@ -119,7 +119,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1077',
         studentName: 'Ian Malcolm',
-        Email: 'ian.malcolm@university.edu', // ADDED
+        email: 'ian.malcolm@university.edu', // ADDED
         referenceCode: 'REF-001242',
         paymentMethod: 'Gcash',
         transactionType: 'Dormitory Fee',
@@ -135,7 +135,7 @@ export const MOCK_TRANSACTION_DATA = [
     {
         campusId: 'C1088',
         studentName: 'Jane Foster',
-        Email: 'jane.foster@university.edu', // ADDED
+        email: 'jane.foster@university.edu', // ADDED
         referenceCode: 'REF-001243',
         paymentMethod: 'Maya',
         transactionType: 'Tuition Fee',

@@ -121,7 +121,7 @@ const displayDate = (dateModel) => {
 const showDetailsModal = ref(false); 
 const selectedTransaction = ref({}); 
 const showStatusUpdateModal = ref(false); 
-const selectedReportTransaction = ref({}); 
+const selectedStatusTransaction = ref({}); 
 
 // NEW: State for Confirmation/Toast
 const showConfirmationModal = ref(false);
@@ -212,28 +212,6 @@ const filteredTransactions = computed(() => {
     return results;
 });
 
-// --- NEW COMPUTED PROPERTY: Total Amount of Filtered Transactions ---
-const totalFilteredAmount = computed(() => {
-    // Only sum transactions that are *not* 'Cancelled' 
-    // This assumes only 'Posted', 'Floating', 'Pending' contribute to the "total" revenue.
-    return filteredTransactions.value.reduce((sum, transaction) => {
-        if (transaction.status !== 'Cancelled') {
-            return sum + transaction.amount;
-        }
-        return sum;
-    }, 0);
-});
-
-// --- NEW UTILITY FUNCTION: Currency Formatting ---
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD', // Use your local currency code (e.g., 'PHP')
-        minimumFractionDigits: 2
-    }).format(amount);
-};
-
-
 // =========================================================================
 // MODAL AND UPDATE LOGIC
 // =========================================================================
@@ -255,7 +233,7 @@ const handleModalPrint = (details) => {
 };
 
 const openStatusUpdateModal = (transaction) => {
-    selectedReportTransaction.value = {
+    selectedStatusTransaction.value = {
         ...transaction,
         studentName: transaction.studentName,
         course: transaction.course || 'N/A', 
@@ -265,7 +243,7 @@ const openStatusUpdateModal = (transaction) => {
 
 const closeStatusUpdateModal = () => {
     showStatusUpdateModal.value = false;
-    selectedReportTransaction.value = {};
+    selectedStatusTransaction.value = {};
     transactionToUpdate.value = null; // Clear update data
 };
 
@@ -277,7 +255,7 @@ const handleStatusUpdate = (details) => {
 
     // Confirmation Modal
     // NOTE: The modal should pass the newStatus, assuming StatusUpdateModal was also updated
-    confirmationMessage.value = `Confirm update status for ${details.studentName} (Ref: ${details.referenceCode}) to **${details.newStatus}**?`;
+    confirmationMessage.value = `Confirm update status for ${details.studentName} (Ref: ${details.referenceCode}) to ${details.newStatus}?`;
     showConfirmationModal.value = true;
 };
 
@@ -308,21 +286,17 @@ const confirmUpdate = () => {
     }
 
     // 5. Close confirmation and reset state
-    showConfirmationModal.value = false;
+    showConfirmationModal.value = true;
     transactionToUpdate.value = null;
 };
 
 const cancelUpdate = () => {
     showConfirmationModal.value = false;
     transactionToUpdate.value = null;
-    alert('Status update cancelled.');
+    // alert('Status update cancelled.');
 };
 
-// --- Keep existing print handler for the Report Modal (from StatusUpdateModal) ---
-// const handleReportModalPrint = (details) => {
-//     console.log("Parent received print request for report:", details.referenceCode);
-//     // The actual printing logic is handled inside StatusUpdateModal via handlePrint
-// };
+
 
 
 </script>
@@ -470,7 +444,7 @@ const cancelUpdate = () => {
 
     <StatusUpdateModal 
         :show="showStatusUpdateModal" 
-        :statusDetails="selectedReportTransaction" 
+        :statusDetails="selectedStatusTransaction" 
         @close="closeStatusUpdateModal"
         @confirm-update="handleStatusUpdate"/>
         <!-- @print="handleReportModalPrint"  -->
