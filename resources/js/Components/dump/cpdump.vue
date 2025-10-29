@@ -94,15 +94,15 @@ const purpose = ref('');
 // OR (Official Receipt) Fields
 const isNameOnOR = ref(true); 
 const organizationNameOR = ref('');
-// **FIELD** for Facilities transaction type
+// **NEW FIELD** for Facilities transaction type
 const facilitiesReferenceNumber = ref('');
 const referenceNumber = ref(''); // For Payment Method Reference Number
 
-// --- VALIDATION STATE ---
+// --- NEW VALIDATION STATE ---
 // Object to hold error messages for inline display
 const validationErrors = ref({}); 
 
-// ** MODAL STATE**
+// **NEW MODAL STATE**
 const showSummaryModal = ref(false);
 
 // --- DYNAMIC FIELD LOGIC ---
@@ -122,7 +122,7 @@ const fieldRequirements = computed(() => {
         campusId: { 
             required: isEnrollment,
             label: 'Campus ID', 
-            optionalLabel: 'Campus ID ',
+            optionalLabel: 'Campus ID (Optional)',
         },
         name: { 
             required: true, 
@@ -131,12 +131,12 @@ const fieldRequirements = computed(() => {
         courseYearSchoolYear: { 
             required: isEnrollment,
             label: 'Course, Year Level, School Year',
-            optionalLabel: 'Course, Year Level, School Year ',
+            optionalLabel: 'Course, Year Level, School Year (Optional)',
         },
         email: { 
-            required: true,
+            required: isEnrollment,
             label: 'Email',
-            optionalLabel: 'Email ',
+            optionalLabel: 'Email (Optional)',
         },
         facilitiesReferenceNumber: {
             required: isFacilities,
@@ -182,6 +182,8 @@ const purposeOptions = computed(() => {
 const isPurposeDropdown = computed(() => {
     return purposeOptions.value.length > 0;
 });
+
+
 // --- AUTOFILL LOGIC (no change, but remains to show full context) ---
 const autofillStudentData = (newCampusId) => {
     if (newCampusId) {
@@ -458,6 +460,7 @@ const clearForm = () => {
                                             :placeholder="transactionType === 'UP Cebu Facilities, Other Equipment and Vehicle Registration' ? 'e.g., UP Cebu Alumni Home Rental' : 'Enter purpose here'" />
 
                                         <div v-if="isPurposeDropdown" class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-brand-maroon-700">
+                                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                                         </div>
                                     </div>
                                     <p v-if="validationErrors.purpose" class="text-xs text-red-500 mt-1">{{ validationErrors.purpose }}</p>
@@ -503,30 +506,20 @@ const clearForm = () => {
                             <h2 class="text-xl font-semibold text-gray-800 mb-4">Personal Information</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                 
-                                <div class="col-span-1">
-                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
-                                    <input type="text" id="name" v-model="name" required 
-                                        :class="{ 'border-red-500': validationErrors.name }"
-                                        class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
-                                    <p v-if="validationErrors.name" class="text-xs text-red-500 mt-1">{{ validationErrors.name }}</p>
-                                </div>
-
-                                   <div :class="{ 'opacity-50': !fieldRequirements.courseYearSchoolYear.required }">
-                                    <label for="course" class="block text-sm font-medium text-gray-700 mb-1">
-                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'Course *' : 'Course ' }}
+                                <div>
+                                    <label for="campusId" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ fieldRequirements.campusId.required ? 'Campus ID' : 'Campus ID (Optional)' }}
                                     </label>
-                                    <input type="text" id="course" v-model="course" 
-                                        :required="fieldRequirements.courseYearSchoolYear.required"
-                                        :class="{ 'border-red-500': validationErrors.course && fieldRequirements.courseYearSchoolYear.required }" 
+                                    <input type="text" id="campusId" v-model="campusId" 
+                                        :required="fieldRequirements.campusId.required"
+                                        :class="{ 'border-red-500': validationErrors.campusId && fieldRequirements.campusId.required }"
                                         class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
-                                    <p v-if="validationErrors.course && fieldRequirements.courseYearSchoolYear.required" class="text-xs text-red-500 mt-1">{{ validationErrors.course }}</p>
+                                    <p v-if="validationErrors.campusId && fieldRequirements.campusId.required" class="text-xs text-red-500 mt-1">{{ validationErrors.campusId }}</p>
                                 </div>
 
-                                
-
-                                 <div>
+                                <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                                        {{ fieldRequirements.email.required ? 'Email *' : 'Email' }}
+                                        {{ fieldRequirements.email.required ? 'Email *' : 'Email (Optional)' }}
                                     </label>
                                     <input type="email" id="email" v-model="email" 
                                         :required="fieldRequirements.email.required"
@@ -536,8 +529,19 @@ const clearForm = () => {
                                 </div>
 
                                 <div :class="{ 'opacity-50': !fieldRequirements.courseYearSchoolYear.required }">
+                                    <label for="course" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'Course *' : 'Course (Optional)' }}
+                                    </label>
+                                    <input type="text" id="course" v-model="course" 
+                                        :required="fieldRequirements.courseYearSchoolYear.required"
+                                        :class="{ 'border-red-500': validationErrors.course && fieldRequirements.courseYearSchoolYear.required }" 
+                                        class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
+                                    <p v-if="validationErrors.course && fieldRequirements.courseYearSchoolYear.required" class="text-xs text-red-500 mt-1">{{ validationErrors.course }}</p>
+                                </div>
+
+                                <div :class="{ 'opacity-50': !fieldRequirements.courseYearSchoolYear.required }">
                                     <label for="yearLevel" class="block text-sm font-medium text-gray-700 mb-1">
-                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'Year Level *' : 'Year Level' }}
+                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'Year Level *' : 'Year Level (Optional)' }}
                                     </label>
                                     <input type="text" id="yearLevel" v-model="yearLevel" 
                                         :required="fieldRequirements.courseYearSchoolYear.required"
@@ -545,23 +549,10 @@ const clearForm = () => {
                                         class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
                                     <p v-if="validationErrors.yearLevel && fieldRequirements.courseYearSchoolYear.required" class="text-xs text-red-500 mt-1">{{ validationErrors.yearLevel }}</p>
                                 </div>
-                                
-
-                             
-                                 <div>
-                                    <label for="campusId" class="block text-sm font-medium text-gray-700 mb-1">
-                                        {{ fieldRequirements.campusId.required ? 'Campus ID' : 'Campus ID' }}
-                                    </label>
-                                    <input type="text" id="campusId" v-model="campusId" 
-                                        :required="fieldRequirements.campusId.required"
-                                        :class="{ 'border-red-500': validationErrors.campusId && fieldRequirements.campusId.required }"
-                                        class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
-                                    <p v-if="validationErrors.campusId && fieldRequirements.campusId.required" class="text-xs text-red-500 mt-1">{{ validationErrors.campusId }}</p>
-                                </div>
 
                                 <div :class="{ 'opacity-50': !fieldRequirements.courseYearSchoolYear.required }">
                                     <label for="schoolYear" class="block text-sm font-medium text-gray-700 mb-1">
-                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'School Year *' : 'School Year' }}
+                                        {{ fieldRequirements.courseYearSchoolYear.required ? 'School Year *' : 'School Year (Optional)' }}
                                     </label>
                                     <input type="text" id="schoolYear" v-model="schoolYear" 
                                         :required="fieldRequirements.courseYearSchoolYear.required"
@@ -570,7 +561,13 @@ const clearForm = () => {
                                     <p v-if="validationErrors.schoolYear && fieldRequirements.courseYearSchoolYear.required" class="text-xs text-red-500 mt-1">{{ validationErrors.schoolYear }}</p>
                                 </div>
                                 
-                                
+                                <div class="col-span-1">
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="name" v-model="name" required 
+                                        :class="{ 'border-red-500': validationErrors.name }"
+                                        class="p-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:ring-brand-maroon focus:border-brand-maroon transition duration-150" />
+                                    <p v-if="validationErrors.name" class="text-xs text-red-500 mt-1">{{ validationErrors.name }}</p>
+                                </div>
                                 
                                 <div class="md:col-span-2 mt-4 border p-2 rounded-lg bg-gray-50">
                                     <p class="block text-sm font-bold text-gray-700 mb-2">Does the above-mentioned name will appear on the Original Receipt (OR)?</p>
@@ -647,10 +644,9 @@ const clearForm = () => {
                         </div>
                     </div>
 
-                         <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow-lg flex flex-col items-center justify-center border border-gray-100 h-screen sticky top-0">
-                    <!-- <div class="lg:col-span-5 bg-white p-5 rounded-xl shadow-lg flex flex-col items-center justify-center border border-gray-100 min-h-[400px] sticky top-4"> -->
+                    <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow-lg flex flex-col items-center justify-center border border-gray-100 min-h-[400px] sticky top-4">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
-                            {{ paymentMethod === 'Cash' ? 'Cash Payment Instructions' : `Scan QR Code: ${paymentMethod}` }}
+                            {{ paymentMethod === 'Cash' ? 'Cash Payment Instructions' : `Details for ${paymentMethod}` }}
                         </h2>
 
                         <div v-if="paymentMethod !== 'Cash' && currentPaymentComponent" 
@@ -778,6 +774,6 @@ const clearForm = () => {
 }
 /* Utility class to visually highlight optional fields (if you want this, otherwise remove) */
 .opacity-50 {
-    opacity: 0.90;
+    opacity: 0.6;
 }
 </style>

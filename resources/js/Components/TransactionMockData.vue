@@ -5,9 +5,9 @@ import axios from 'axios';
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
 //Modals
-import PaymentDetailsModal from './PaymentDetailsModal.vue';
-import StatusUpdateModal from './StatusUpdateModal.vue';
-import ConfirmationModal from './ConfirmationModal.vue'; 
+import PaymentDetailsModal from './Modals/PaymentDetailsModal.vue';
+import StatusUpdateModal from './Modals/StatusUpdateModal.vue';
+import ConfirmationModal from './Modals/ConfirmationModal.vue'; 
 //DatePicker Component
 import DatePicker from './DatePicker.vue'; 
 import SVG from './SVG.vue';

@@ -7,7 +7,7 @@ import axios from 'axios';
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
 
-import PaymentDetailsModal from '../PaymentDetailsModal.vue';
+import PaymentDetailsModal from '../Modals/PaymentDetailsModal.vue';
 import ReportsModal from './ReportsModal.vue';
 
 
