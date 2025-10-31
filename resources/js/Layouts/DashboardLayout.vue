@@ -5,7 +5,7 @@ import NavHeader from '@/Components/NavHeader.vue';
 import Sidebar from '@/Components/Sidebar.vue';
 import PaymentCards from '@/Components/PaymentCards.vue'; 
 // import TransactionList from '@/Components/TransactionList.vue'; 
-import TransactionMockData from '@/Components/TransactionMockData.vue'; 
+import TransactionMockData from '@/Components/TransactionList/TransactionMockData.vue'; 
 // Note: SVG component is imported in Sidebar.vue
 
 const menuItems = [
