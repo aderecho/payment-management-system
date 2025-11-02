@@ -1,148 +1,226 @@
+<!-- RECEIPT MODAL -->
 <script setup>
-import { defineProps, defineEmits, computed, ref } from 'vue'; // 👈 Import 'ref' for template reference
-import '@fortawesome/fontawesome-free/css/all.min.css'; 
+import { defineProps, defineEmits, computed, ref } from 'vue'
+import SVG from '../SVG.vue';
 
-// Define the template reference for the printable area
-const printContentRef = ref(null);
+const printContentRef = ref(null)
 
 const props = defineProps({
-    // Prop to control visibility, received from the parent
-    show: {
-        type: Boolean,
-        required: true
-    },
-    // Data to display in the modal, matching the fields in the image
-    paymentDetails: {
-        type: Object,
-        default: () => ({
-            campusId: '',
-            studentName: '',
-            email: '',
-            course: '',
-            yearLevel: '',
-            schoolYear: '',
-            referenceCode: '',
-            paymentMethod: '',
-            transactionType: '',
-            date: '',
-            // status: '',
-            amount: 0,
-        })
-    }
-});
+  show: { type: Boolean, required: true },
+  paymentDetails: {
+    type: Object,
+    default: () => ({
+      receiptNo: '',
+      campusId: '',
+      studentName: '',
+      course: '',
+      yearLevel: '',
+      schoolYear: '',
+      referenceCode: '',
+      paymentMethod: '',
+      transactionType: '',
+      date: '',
+      amount: 0,
+      cashReceived: 0,
+      change: 0,
+      cashierName: 'Cashier 1',
+    }),
+  },
+})
 
-// Define the event the component will emit to the parent to close itself
-const emit = defineEmits(['close', 'print']);
+const emit = defineEmits(['close', 'print'])
 
-// Function to handle the print action (NEW LOGIC)
-const handlePrint = () => {
-    const divToPrint = printContentRef.value;
-    
-    if (divToPrint) {
-        // 1. Open a new window
-        const newwin = window.open("");
-
-        // 2. Write the content of the print area to the new window's document
-        // We include a basic HTML structure and some inline styles to ensure readability
-        newwin.document.write('<html><head><title>University of the Philippines Cebu</title>');
-        // Optional: Include any necessary CSS for the printed page here
-        newwin.document.write('<style>body { font-family: sans-serif; padding: 20px; } .print-area { max-width: 400px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; } h3 { text-align: center; margin-bottom: 20px; } .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; } .key { font-weight: bold; margin-right: 15px; } .status-badge { display: inline-block; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; } .bg-green-200 { background-color: #d1fae5; color: #065f46; } .bg-yellow-200 { background-color: #fef3c7; color: #92400e; } .amount-value { font-size: 1.25rem; font-weight: bold; } @media print { .no-print { display: none; } }</style>');
-        newwin.document.write('</head><body>');
-        newwin.document.write(divToPrint.innerHTML); // Write the inner content
-        newwin.document.write('</body></html>');
-        newwin.document.close();
-
-        // 3. Print the new window
-        newwin.print();
-
-        // 4. Close the new window (usually after the print dialog is closed)
-        //  newwin.close(); // You might comment this out to let the user review the print preview
-        
-    } else {
-        console.error("Print area not found.");
-    }
-
-    // Still useful for parent component tracking/logging
-    emit('print', props.paymentDetails); 
-    console.log("Printing details initiated for:", props.paymentDetails.referenceCode);
-};
-
-// Helper function to format the amount
 const formatAmount = (amount) => {
-    if (typeof amount !== 'number') return '₱0';
-    return `₱${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
+  const num = parseFloat(amount)
+  if (isNaN(num)) return '₱0.00'
+  return `₱${num.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+}
 
-// Array defining the key-value pairs for easy rendering and styling
-const detailItems = computed(() => [
-    { key: 'Campus ID', value: props.paymentDetails.campusId },
-    { key: 'Name', value: props.paymentDetails.studentName },
-    { key: 'Email', value: props.paymentDetails.email },
-    { key: 'Course', value: props.paymentDetails.course },
-    { key: 'Year Level', value: props.paymentDetails.yearLevel },
-    { key: 'School Year', value: props.paymentDetails.schoolYear },
-    { key: 'Reference Code', value: props.paymentDetails.referenceCode },
-    { key: 'Payment Method', value: props.paymentDetails.paymentMethod },
-    { key: 'Transaction Type', value: props.paymentDetails.transactionType },
-    { key: 'Date', value: props.paymentDetails.date },
-]);
+// 🖨 Handle print popup
+const handlePrint = () => {
+  const printArea = printContentRef.value
+  if (!printArea) return
+
+  const printContent = printArea.querySelector('.receipt-content').innerHTML
+  const newTab = window.open('', '_blank')
+  newTab.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cash Receipt</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: #fff;
+      color: #000;
+      margin: 0;
+      padding: 10px;
+      font-size: 12px;
+    }
+    .receipt {
+      width: 58mm;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .line {
+      border-top: 1px dashed #6a0d1b;
+      margin: 6px 0;
+    }
+    .section {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 2px 0;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 13px;
+      margin-top: 6px;
+      color: #6a0d1b;
+    }
+    .thank {
+      text-align: center;
+      font-size: 11px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #6a0d1b;
+    }
+    @media print {
+      body {
+        width: 58mm;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt">
+    ${printContent}
+  </div>
+  <script>
+    window.onload = function() { window.print(); };
+  <\/script>
+</body>
+</html>
+`)
+  newTab.document.close()
+  emit('print', props.paymentDetails)
+}
+
+const descriptionItems = computed(() => [
+  { name: 'Campus ID', price: props.paymentDetails.campusId },
+  { name: 'Student Name', price: props.paymentDetails.studentName },
+  { name: 'Course', price: props.paymentDetails.course },
+  { name: 'Year Level', price: props.paymentDetails.yearLevel },
+  { name: 'School Year', price: props.paymentDetails.schoolYear },
+  { name: 'Transaction', price: props.paymentDetails.transactionType },
+  { name: 'Payment Method', price: props.paymentDetails.paymentMethod },
+  { name: 'Reference', price: props.paymentDetails.referenceCode },
+  { name: 'Date', price: props.paymentDetails.date },
+])
 </script>
 
 <template>
-    <div v-if="show" class=" fixed inset-0 z-50 flex items-center justify-center p-1 bg-gray-900 bg-opacity-50">
-        
-        <div ref="printContentRef" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all duration-300 scale-100 opacity-100 my-2 md:h-[32rem]">
-            
-            <div class="flex justify-between items-center mb-1 pb-2 border-b no-print">
-                <h3 class="text-xl font-bold text-gray-800">University of the Philippines Cebu</h3>
-                <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 transition">
-                    <i class="fa-solid fa-times text-xl"></i>
-                </button>
-            </div>
+  <div
+    v-if="show"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 p-2"
+  >
+    <div
+      ref="printContentRef"
+      class="relative bg-white rounded-lg shadow-2xl w-full max-w-xs p-5 border border-gray-200"
+    >
+      <!-- Close Button -->
+      <button
+        @click="emit('close')"
+        class="absolute top-2 right-2 text-gray-500 hover:text-[#6a0d1b] transition"
+        aria-label="Close"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
-            <h3 class="no-print:hidden text-2xl font-bold text-gray-800 text-center mb-2">Payment Details Receipt</h3>
-            
-            <div class="space-y-3 text-sm text-gray-700">
-                
-                <div v-for="item in detailItems" :key="item.key" class="flex justify-between detail-row">
-                    <p class="font-bold mr-4 key">{{ item.key }}:</p>
-                    <p class="text-right">{{ item.value }}</p>
-                </div>
-                
-                <!-- <div class="flex justify-between detail-row">
-                    <p class="font-bold mr-4 key">Status:</p>
-                    <p class="text-right">
-                        <span 
-                            :class="{
-                                'bg-green-200 text-green-800': paymentDetails.status === 'Posted',
-                                'bg-yellow-200 text-yellow-800': paymentDetails.status === 'Floating',
-                                'bg-red-200 text-red-800': paymentDetails.status === 'Cancelled',
-                                'bg-gray-200 text-gray-800': paymentDetails.status === 'Pending',
-                            }"
-                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold status-badge"
-                        >
-                            {{ paymentDetails.status || 'N/A' }}
-                        </span>
-                    </p>
-                </div> -->
-
-                <div class="flex justify-between pt-2 detail-row">
-                    <p class="font-bold mr-4 key">Amount:</p>
-                    <p class="font-bold text-lg text-gray-900 amount-value">{{ formatAmount(paymentDetails.amount) }}</p>
-                </div>
-
-            </div>
-            
-            <div class="mt-1.5 flex justify-end no-print">
-                <button 
-                    @click="handlePrint" 
-                    class="px-3 py-1.5 mb-2 text-sm  bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center shadow-md font-semibold"
-                >
-                    Print Payment 
-                    <i class="fa-solid fa-print ml-2"></i>
-                </button>
-            </div>
-
+      <!-- Receipt Preview -->
+      <div class="receipt-content font-mono ">
+        <!-- Header -->
+        <div class="center">
+          <h2 class="text-sm font-bold text-[#6a0d1b]">UNIVERSITY OF THE PHILIPPINES CEBU</h2>
+          <p class="text-[11px] text-gray-600">Gorordo Ave, Cebu City, 6000 Cebu</p>
+          <p class="text-[11px] text-gray-600">Tel. No: +63 2 8981-8500</p>
         </div>
+
+        <div class="line"></div>
+        <div class="center font-bold text-[#6a0d1b]">CASH RECEIPT</div>
+        <div class="line"></div>
+
+        <!-- Items -->
+        <div class="section">
+          <div class="flex justify-between row font-bold border-b border-dashed border-gray-300 pb-1">
+            <span>Description</span>
+            <span>Details</span>
+          </div>
+          <div v-for="item in descriptionItems" :key="item.name" class="flex justify-between row text-sm">
+            <span>{{ item.name }}</span>
+            <span>{{ item.price || '-' }}</span>
+          </div>
+        </div>
+
+        <div class="line"></div>
+
+        <!-- Totals -->
+        <div class="section ">
+          <div class="flex justify-between total-row">
+            <span>Total</span>
+            <span>{{ formatAmount(paymentDetails.amount) }}</span>
+          </div>
+          <div class="flex justify-between row">
+            <span>Cash</span>
+            <span>{{ formatAmount(paymentDetails.cashReceived) }}</span>
+          </div>
+          <div class="flex justify-between row">
+            <span>Change</span>
+            <span>{{ formatAmount(paymentDetails.change) }}</span>
+          </div>
+        </div>
+
+        <div class="line"></div>
+
+        <!-- Approval + Cashier -->
+        <div class="section text-sm">
+          <div class="flex justify-between row">
+            <span>Receipt No</span>
+            <span>#{{ paymentDetails.receiptNo || '00012345' }}</span>
+          </div>
+          <div class="flex justify-between row">
+            <span>Cashier</span>
+            <span>{{ paymentDetails.cashierName }}</span>
+          </div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="flex justify-center thank">THANK YOU!</div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="mt-4 flex justify-end gap-2">
+        <button
+          @click="handlePrint"
+          class="px-3 py-1.5 text-sm bg-[#6a0d1b] text-white rounded-md hover:bg-[#510a15] transition-colors flex items-center gap-1"
+        >
+          <span>Print</span>
+               <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"> </SVG>
+        </button>
+      </div>
     </div>
+  </div>
 </template>

@@ -83,6 +83,7 @@ watch(
         <input
           v-model="data.campusId"
           type="text"
+          placeholder="ex. 202500129"
           required
           :class="[
             'p-2 border rounded-lg w-full',
@@ -198,7 +199,7 @@ watch(
         <input
           v-model="data.schoolYear"
           type="text"
-          placeholder="e.g., 2025-2026 1st Semester"
+          placeholder="ex. 2025-2026 1st Semester"
           :disabled="hideCourseYearFields"
           :required="!hideCourseYearFields"
           :class="[

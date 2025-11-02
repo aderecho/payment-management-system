@@ -9,9 +9,28 @@ import SummaryModal from '@/Components/CounterPayment/SummaryModal.vue';
 
 // Sidebar setup
 const isSidebarOpen = ref(true);
-const isMobile = computed(() => window.innerWidth < 1024);
-onMounted(() => { isSidebarOpen.value = !isMobile.value; });
 const toggleSidebar = () => (isSidebarOpen.value = !isSidebarOpen.value);
+const isMobile = computed(() => window.innerWidth < 1024);
+
+onMounted(() => {
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  } else {
+    isSidebarOpen.value = true;
+  }
+});
+
+const openSidebarOnEnter = () => {
+  if (!isMobile.value) {
+    isSidebarOpen.value = true;
+  }
+};
+
+const closeSidebarOnLeave = () => {
+  if (!isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+};
 
 // Menu
 const menuItems = [
@@ -94,6 +113,8 @@ const closeSummary = () => (showSummaryModal.value = false);
       <Sidebar
         :menu-items="menuItems"
         :is-sidebar-open="isSidebarOpen"
+         @mouseenter="openSidebarOnEnter"
+         @mouseleave="closeSidebarOnLeave"
       />
       <main class="flex-1 transition-all duration-300 p-4 min-w-0"
         :class="{ 'lg:ml-[12.5rem]': isSidebarOpen, 'lg:ml-[4.5rem]': !isSidebarOpen }">

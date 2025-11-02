@@ -64,8 +64,8 @@ const closeSidebarOnLeave = () =>{
 
     
             <!-- <TransactionList /> -->
-            <!-- <TransactionMockData />
-             //view edit -->
+            <TransactionMockData />
+          
              
         </main>
         

@@ -5,9 +5,9 @@ import axios from 'axios';
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
 //Modals
-import PaymentDetailsModal from '@/Modals/PaymentDetailsModal.vue';
-import StatusUpdateModal from '@/Modals/StatusUpdateModal.vue';
-import ConfirmationModal from '@/Modals/ConfirmationModal.vue'; 
+import PaymentDetailsModal from '../Modals/PaymentDetailsModal.vue';
+import StatusUpdateModal from '../Modals/StatusUpdateModal.vue';
+import ConfirmationModal from '../Modals/ConfirmationModal.vue'; 
 //DatePicker Component
 import DatePicker from './DatePicker.vue'; 
 import SVG from '../SVG.vue';
@@ -15,7 +15,22 @@ import SVG from '../SVG.vue';
 import { MOCK_TRANSACTION_DATA } from '@/MockData.js'; 
 
 
-// --- MOCK USER/TRANSACTION DATA ---
+//receipt
+import ViewDetails from './ViewDetails.vue' // View Details modal import
+
+const showViewDetailsModal = ref(false)
+const selectedViewDetails = ref({})
+
+const openViewDetailsModal = (transaction) => {
+  selectedViewDetails.value = transaction
+  showViewDetailsModal.value = true
+}
+
+const closeViewDetailsModal = () => {
+  showViewDetailsModal.value = false
+  selectedViewDetails.value = {}
+}
+
 
 // ---------------------------------
 const mockTransactions = MOCK_TRANSACTION_DATA;
@@ -402,20 +417,39 @@ const cancelUpdate = () => {
                         
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-medium flex space-x-2">
                             
-                            <button 
-                                @click="openPaymentDetailsModal(transaction)" 
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
-                                
-                                View <i class="fa-solid fa-eye ml-1"></i>
+
+                            <!-- 👁 VIEW DETAILS (Opens New Modal) -->
+                            <button
+                                @click="openViewDetailsModal(transaction)"
+                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-normal py-1.5 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M1.5 12s4.5-7.5 10.5-7.5S22.5 12 12 19.5 1.5 12 1.5 12z" />
+                                <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                View
                             </button>
 
-                            <button 
-                                @click="openStatusUpdateModal(transaction)" 
-                                class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md">
-                                Update <i class="fa-solid fas fa-edit ml-1"></i>
+                            <!-- ⚙️ UPDATE STATUS -->
+                            <button
+                                @click="openStatusUpdateModal(transaction)"
+                                class="bg-gray-300 hover:bg-gray-400 text-gray-700 text-xs font-normal py-1.5 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md"
+                            >
+                                <i class="fa-solid fa-edit mr-1"></i>
+                                Update
                             </button>
-
+                            <!-- 🧾 RECEIPT (Print Icon) -->
+                            <button
+                                @click="openPaymentDetailsModal(transaction)"
+                                class="bg-green-900 hover:bg-green-700 text-white text-xs font-normal py-1.5 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V2h12v7M6 18h12M6 14h12m-6 8v-4" />
+                                </svg>
+                                Receipt
+                            </button>
                         </td>
+
                     </tr>
                     <tr v-if="!isLoading && !fetchError && filteredTransactions.length === 0">
                         <td :colspan="headers.length" class="px-4 py-8 text-center text-gray-500 text-base">
@@ -429,8 +463,8 @@ const cancelUpdate = () => {
         
             <div class="flex justify-end mt-3.5">
                 <button class="flex items-center rounded-lg shadow-lg py-1 px-3 bg-brand-maroon hover:bg-brand-maroon-hover text-white text-xs font-semibold transition duration-150">
-                     <span>Generate Report</span>
-                     <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"/>
+                   <span>Generate Report</span>
+                     <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"> </SVG>
                 </button>
              </div>
          </div>
@@ -441,6 +475,11 @@ const cancelUpdate = () => {
         @close="closePaymentDetailsModal"
         @print="handleModalPrint"
     />
+    <ViewDetails
+  :show="showViewDetailsModal"
+  :details="selectedViewDetails"
+  @close="closeViewDetailsModal"
+/>
 
     <StatusUpdateModal 
         :show="showStatusUpdateModal" 

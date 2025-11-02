@@ -1,33 +1,83 @@
 <script setup>
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps({
   formData: Object,
-});
+})
 
 const paymentImages = {
-  'Gcash': 'https://via.placeholder.com/300x300?text=Gcash+QR+Code',
-  'Maya': 'https://via.placeholder.com/300x300?text=Maya+QR+Code',
-  'Bank Transfer': 'https://via.placeholder.com/300x300?text=Bank+Transfer+Details',
-};
+  Gcash: '/images/gcashqr.png',
+  Maya: '/images/mayaqr.png',
+  'Bank Transfer': '/images/bankqr.png',
+}
 
 const paymentDisplay = computed(() => {
-  if (props.formData.paymentMethod === 'Cash') return null;
-  return paymentImages[props.formData.paymentMethod] || null;
-});
+  if (props.formData.paymentMethod === 'Cash') return null
+  return paymentImages[props.formData.paymentMethod] || null
+})
 </script>
 
 <template>
-  <div class="bg-white p-5 rounded-xl shadow-lg flex flex-col items-center justify-center border border-gray-100 h-screen sticky top-0">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
-      {{ formData.paymentMethod === 'Cash' ? 'Cash Payment Instructions' : `Scan QR Code: ${formData.paymentMethod}` }}
+  <!-- ✅ Fully responsive container -->
+  <div
+    class="bg-white flex flex-col items-center justify-center 
+           border border-gray-200 rounded-xl shadow-lg 
+           w-full h-full min-h-[400px] 
+           p-6 sm:p-8 md:p-10 
+           transition-all duration-300 
+           sticky top-0"
+  >
+    <!-- Title -->
+    <h2
+      class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-4 text-center leading-tight"
+    >
+      {{ formData.paymentMethod === 'Cash'
+        ? 'Cash Payment Instructions'
+        : `Scan QR Code: ${formData.paymentMethod}` }}
     </h2>
 
-    <div v-if="paymentDisplay" class="w-full max-w-xs">
-      <img :src="paymentDisplay" class="rounded-lg w-full object-contain" />
+    <!-- QR or Instructions -->
+    <div
+      v-if="paymentDisplay"
+      class="flex flex-col items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
+    >
+      <img
+        :src="paymentDisplay"
+        class="rounded-lg w-full object-contain shadow-md transition-transform duration-300 hover:scale-105"
+        alt="QR Code"
+      />
+      <p class="text-sm sm:text-base text-gray-600 mt-3 text-center">
+        Please scan this code to proceed with your payment.
+      </p>
     </div>
-    <p v-else-if="formData.paymentMethod === 'Cash'" class="text-gray-600 text-center">
+
+    <!-- Cash payment message -->
+    <p
+      v-else-if="formData.paymentMethod === 'Cash'"
+      class="text-gray-600 text-center text-sm sm:text-base md:text-lg mt-4"
+    >
       Payment will be processed by the counter personnel.
     </p>
   </div>
 </template>
+
+<style scoped>
+/* Make sure images resize correctly */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Smooth scaling when zooming or resizing */
+@media (max-width: 768px) {
+  div {
+    padding: 1rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  div {
+    transition: all 0.3s ease-in-out;
+  }
+}
+</style>

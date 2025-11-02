@@ -27,18 +27,18 @@ const cardData = ref([
 </script>
 
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 mt-16 ">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4 mt-16 ">
         
         <div 
             v-for="card in cardData" 
             :key="card.title"
             class="shadow-xl rounded-lg overflow-hidden" 
         >
-            <div :class="card.headerBgColor" class="p-4 text-white text-sm  font-semibold rounded-t-lg">
+            <div :class="card.headerBgColor" class="p-4 text-white text-md  font-semibold rounded-t-lg ">
                 {{ card.title }}
             </div>
 
-            <div class="bg-white p-4 rounded-b-lg">
+            <div class="bg-white p-4 rounded-b-lg h-full">
                 <p class="text-4xl font-extrabold mb-1">₱{{ card.value }}</p>
                 <p :class="card.percentageColor" class="text-sm font-medium">{{ card.percentageChange }}</p>
             </div>
