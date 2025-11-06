@@ -107,7 +107,7 @@ const closeSummary = () => (showSummaryModal.value = false);
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 flex flex-col">
+  <div class="min-h-screen  bg-gray-100 flex flex-col">
     <NavHeader @toggleSidebar="toggleSidebar" />
     <div class="flex-1 flex">
       <Sidebar
@@ -118,15 +118,15 @@ const closeSummary = () => (showSummaryModal.value = false);
       />
       <main class="flex-1 transition-all duration-300 p-4 min-w-0"
         :class="{ 'lg:ml-[12.5rem]': isSidebarOpen, 'lg:ml-[4.5rem]': !isSidebarOpen }">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4 ml-2">Over the Counter Payment</h1>
+    
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full mt-16">
           <div class="lg:col-span-3 space-y-4">
-            <TransactionDetails
+            <TransactionDetails 
               v-model="formData"
               :validation-errors="validationErrors"
             />
-            <PersonalInformation
+            <PersonalInformation class=""
               v-model="formData"
               :validation-errors="validationErrors"
               @clear="clearForm"
@@ -134,7 +134,7 @@ const closeSummary = () => (showSummaryModal.value = false);
             />
           </div>
 
-          <div class="lg:col-span-2">
+          <div class="lg:col-span-2 w-auto">
             <PaymentPreview :form-data="formData" />
           </div>
         </div>

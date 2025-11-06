@@ -20,9 +20,9 @@ const paymentDisplay = computed(() => {
 <template>
   <!-- ✅ Fully responsive container -->
   <div
-    class="bg-white flex flex-col items-center justify-center 
+    class="bg-white flex flex-col items-center justify-center  
            border border-gray-200 rounded-xl shadow-lg 
-           w-full h-full min-h-[400px] 
+           w-full h-full min-h-25
            p-6 sm:p-8 md:p-10 
            transition-all duration-300 
            sticky top-0"

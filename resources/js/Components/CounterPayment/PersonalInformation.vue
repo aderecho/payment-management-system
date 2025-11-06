@@ -13,16 +13,6 @@ const data = computed({
   set: (v) => emit("update:modelValue", v),
 });
 
-// Hide asterisk and disable Course, Year Level, and School Year 
-// for specific Transaction Types
-const hideCourseYearFields = computed(() => {
-  const exemptTypes = [
-    "University Library-Fees & Fines",
-    "UP Cebu Facilities, Other Equipment and Vehicle Registration",
-  ];
-  return exemptTypes.includes(data.value.transactionType);
-});
-
 // COURSE AND YEAR LEVEL DATA ---
 const courseOptions = {
   "Arts and Humanities": [
@@ -52,20 +42,31 @@ const courseOptions = {
 };
 
 const yearLevelOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-// --- END COURSE DATA ---
 
 const handleClear = () => emit("clear");
 const handleSubmit = () => emit("submit");
 
-// Watcher to clear the orName when the user selects 'Yes'
+// Automatically clear OR Name when “Yes” is selected
 watch(
   () => data.value.isNameOnOR,
   (newValue) => {
-    if (newValue === true) {
-      data.value.orName = "";
-    }
+    if (newValue === true) data.value.orName = "";
   }
 );
+
+// Check if transaction is University Enrollment related
+const isUniversityEnrollmentRelated = computed(() => {
+  if (!data.value.transactionType) return false;
+  const keywords = [
+    "University Enrollment",
+    "Enrollment",
+    "Admission",
+    "Registration",
+  ];
+  return keywords.some((word) =>
+    data.value.transactionType.toLowerCase().includes(word.toLowerCase())
+  );
+});
 </script>
 
 <template>
@@ -84,11 +85,8 @@ watch(
           v-model="data.campusId"
           type="text"
           placeholder="ex. 202500129"
-          required
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.campusId ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.campusId ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.campusId" class="text-xs text-red-500 mt-1">
           {{ validationErrors.campusId }}
@@ -99,16 +97,17 @@ watch(
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Course
-          <span v-if="!hideCourseYearFields" class="text-red-500">*</span>
+          <span
+            v-if="!isUniversityEnrollmentRelated"
+            class="text-gray-400 text-sm font-normal"
+          >
+            (Optional)
+          </span>
         </label>
         <select
           v-model="data.course"
-          :disabled="hideCourseYearFields"
-          :required="!hideCourseYearFields"
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.course ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.course ? 'border-red-500' : 'border-gray-300'"
         >
           <option disabled value="">Select a Course</option>
           <template v-for="(courses, category) in courseOptions" :key="category">
@@ -127,18 +126,14 @@ watch(
       <!-- Name -->
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
-          Name: (Lastname, Firstname, MI)
-          <span class="text-red-500">*</span>
+          Name: (Lastname, Firstname, MI) <span class="text-red-500">*</span>
         </label>
         <input
           v-model="data.name"
           type="text"
           placeholder="ex. Smith, John"
-          required
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.name ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.name ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.name" class="text-xs text-red-500 mt-1">
           {{ validationErrors.name }}
@@ -149,16 +144,17 @@ watch(
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Year Level
-          <span v-if="!hideCourseYearFields" class="text-red-500">*</span>
+          <span
+            v-if="!isUniversityEnrollmentRelated"
+            class="text-gray-400 text-sm font-normal"
+          >
+            (Optional)
+          </span>
         </label>
         <select
           v-model="data.yearLevel"
-          :disabled="hideCourseYearFields"
-          :required="!hideCourseYearFields"
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.yearLevel ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.yearLevel ? 'border-red-500' : 'border-gray-300'"
         >
           <option disabled value="">Select Year Level</option>
           <option v-for="level in yearLevelOptions" :key="level" :value="level">
@@ -179,11 +175,8 @@ watch(
           v-model="data.email"
           type="email"
           placeholder="johnsmith@example.com"
-          required
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.email ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.email ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.email" class="text-xs text-red-500 mt-1">
           {{ validationErrors.email }}
@@ -194,34 +187,32 @@ watch(
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           School Year
-          <span v-if="!hideCourseYearFields" class="text-red-500">*</span>
+          <span
+            v-if="!isUniversityEnrollmentRelated"
+            class="text-gray-400 text-sm font-normal"
+          >
+            (Optional)
+          </span>
         </label>
         <input
           v-model="data.schoolYear"
           type="text"
           placeholder="ex. 2025-2026 1st Semester"
-          :disabled="hideCourseYearFields"
-          :required="!hideCourseYearFields"
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.schoolYear ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.schoolYear ? 'border-red-500' : 'border-gray-300'"
         />
-        <p
-          v-if="validationErrors.schoolYear"
-          class="text-xs text-red-500 mt-1"
-        >
+        <p v-if="validationErrors.schoolYear" class="text-xs text-red-500 mt-1">
           {{ validationErrors.schoolYear }}
         </p>
       </div>
 
       <!-- Name on OR -->
-      <div class="md:col-span-2 mt-4 border p-2 rounded-lg bg-gray-50">
+      <div class="md:col-span-2 mt-4 border p-3 rounded-lg bg-gray-50">
         <p class="block text-sm font-bold text-gray-700 mb-2">
           Does the above-mentioned name appear on the Original Receipt (OR)?
         </p>
         <div class="flex flex-col space-y-2">
-          <div class="flex items-center">
+          <label class="flex items-center">
             <input
               id="name-on-or-yes"
               name="name-on-or"
@@ -230,14 +221,9 @@ watch(
               v-model="data.isNameOnOR"
               class="h-4 w-4 text-brand-maroon border-gray-300 focus:ring-brand-maroon"
             />
-            <label
-              for="name-on-or-yes"
-              class="ml-2 block text-sm font-medium text-gray-700"
-            >
-              Yes
-            </label>
-          </div>
-          <div class="flex items-start">
+            <span class="ml-2 text-sm text-gray-700">Yes</span>
+          </label>
+          <label class="flex items-start">
             <input
               id="name-on-or-no"
               name="name-on-or"
@@ -246,14 +232,10 @@ watch(
               v-model="data.isNameOnOR"
               class="h-4 w-4 text-brand-maroon border-gray-300 focus:ring-brand-maroon mt-1"
             />
-            <label
-              for="name-on-or-no"
-              class="ml-2 block text-sm font-medium text-gray-700"
-            >
-              No (Kindly indicate the complete name of the organization /
-              company to be printed on the OR)
-            </label>
-          </div>
+            <span class="ml-2 text-sm text-gray-700">
+              No (Kindly indicate the complete name of the organization / company to be printed on the OR)
+            </span>
+          </label>
         </div>
       </div>
 
@@ -265,12 +247,9 @@ watch(
         <input
           v-model="data.orName"
           type="text"
-          required
           placeholder="Enter Name of Organization / Company"
-          :class="[
-            'p-2 border rounded-lg w-full',
-            validationErrors.orName ? 'border-red-500' : 'border-gray-300',
-          ]"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.orName ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.orName" class="text-xs text-red-500 mt-1">
           {{ validationErrors.orName }}
@@ -278,6 +257,7 @@ watch(
       </div>
     </div>
 
+    <!-- Buttons -->
     <div class="flex justify-end gap-3 mt-6">
       <button
         type="button"

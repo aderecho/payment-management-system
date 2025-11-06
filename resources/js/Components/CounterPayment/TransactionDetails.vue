@@ -83,7 +83,7 @@ watch(
 </script>
 
 <template>
-  <div class="bg-white p-5 rounded-xl shadow-lg">
+  <div class="bg-white p-5 rounded-xl shadow-lg w-full">
     <h2 class="text-xl font-semibold text-gray-800 mb-4">
       Transaction Details
     </h2>
