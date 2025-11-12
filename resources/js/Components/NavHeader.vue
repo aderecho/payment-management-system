@@ -63,8 +63,8 @@ const userAvatarUrl = ref(props.user.avatarUrl);
         
 
         <!-- Profile Area (Now dynamic and contained with 'relative' for dropdown) -->
-        <div class="relative flex items-center gap-3">
-            <div class="h-[40px] flex items-center justify-end gap-2">
+        <div class="relative flex items-center gap-3  ">
+            <div class="h-[40px] flex items-center justify-end gap-2 ">
                 
                 <!-- Profile Button wraps the Avatar and Chevron -->
                 <button 
@@ -115,7 +115,7 @@ const userAvatarUrl = ref(props.user.avatarUrl);
                         <a 
                             href="#" 
                             @click.prevent="handleLogout"
-                            class="text-gray-700 block px-4 py-2 text-sm hover:bg-red-50 hover:text-red-600 transition duration-150 ease-in-out font-medium flex items-center" 
+                            class="text-gray-700  px-4 py-2 text-sm hover:bg-red-50 hover:text-red-600 transition duration-150 ease-in-out font-medium flex items-center" 
                             role="menuitem" 
                             tabindex="-1"
                             id="menu-item-logout"

@@ -6,9 +6,9 @@ const props = defineProps({
 });
 
 const paymentImages = {
-  'Gcash': 'https://via.placeholder.com/300x300?text=Gcash+QR+Code',
-  'Maya': 'https://via.placeholder.com/300x300?text=Maya+QR+Code',
-  'Bank Transfer': 'https://via.placeholder.com/300x300?text=Bank+Transfer+Details',
+  Gcash: '/images/gcashqr.png',
+  Maya: '/images/mayaqr.png',
+  'Bank Transfer': '/images/bankqr.png',
 };
 
 const paymentDisplay = computed(() => {

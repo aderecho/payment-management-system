@@ -50,7 +50,37 @@ const fieldRequirements = computed(() => ({
     data.value.transactionType ===
     'UP Cebu Facilities, Other Equipment and Vehicle Registration',
   isNotCashPayment: data.value.paymentMethod !== 'Cash',
+  isLibraryFee: data.value.transactionType === 'University Library-Fees & Fines',
+  isLibraryAmountHidden:
+    data.value.transactionType === 'University Library-Fees & Fines',
 }));
+
+// Conditional field logic for Library Fees & Fines
+const libraryFeeRequirements = computed(() => {
+  if (data.value.transactionType !== 'University Library-Fees & Fines') {
+    return {};
+  }
+  const purpose = data.value.purpose;
+  return {
+    isOverdueOrLost: purpose === 'Overdue Books' || purpose === 'Lost Books',
+    isInternetFee: purpose === 'Internet Fee',
+    isAlumniResearchersFee: purpose === 'Alumni and Researchers Fee',
+    isNonUPPrivate: purpose === 'Non-UP (Private)',
+    isPhotocopyPrintingScanning:
+      purpose === 'Photocopy' || purpose === 'Printing' || purpose === 'Scanning',
+    // Conditional Label for Amount field
+    isAmountLabelTotalFine: purpose === 'Overdue Books' || purpose === 'Lost Books',
+  };
+});
+
+// Dynamic label for the main Amount field
+const amountLabel = computed(() => {
+  if (libraryFeeRequirements.value.isAmountLabelTotalFine) {
+    return 'Amount (Total Fine)';
+  }
+  return 'Amount';
+});
+
 
 // Purpose dropdown logic
 const purposeOptions = computed(() => {
@@ -68,6 +98,11 @@ watch(
   () => {
     data.value.purpose = '';
     data.value.facilitiesReferenceNumber = '';
+    // Reset Library-specific fields
+    data.value.accessionNumber = '';
+    data.value.numberOfHours = '';
+    data.value.numberOfDays = '';
+    data.value.numberOfPages = '';
   }
 );
 
@@ -80,6 +115,20 @@ watch(
     }
   }
 );
+
+// Reset additional fields on purpose change (only for library fees)
+watch(
+  () => data.value.purpose,
+  (newPurpose, oldPurpose) => {
+    if (data.value.transactionType === 'University Library-Fees & Fines' && newPurpose !== oldPurpose) {
+      // Reset all library specific fields when purpose changes
+      data.value.accessionNumber = '';
+      data.value.numberOfHours = '';
+      data.value.numberOfDays = '';
+      data.value.numberOfPages = '';
+    }
+  }
+);
 </script>
 
 <template>
@@ -88,8 +137,8 @@ watch(
       Transaction Details
     </h2>
 
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-      <!-- Transaction Type -->
       <div class="md:col-span-2">
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Transaction Type <span class="text-red-500">*</span>
@@ -109,7 +158,7 @@ watch(
         </p>
       </div>
 
-      <!-- Payment Method -->
+
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Payment Method <span class="text-red-500">*</span>
@@ -129,7 +178,7 @@ watch(
         </p>
       </div>
 
-      <!-- Purpose -->
+
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           {{ purposeLabel }} <span class="text-red-500">*</span>
@@ -158,7 +207,120 @@ watch(
         </p>
       </div>
 
-      <!-- Facilities Reference Number -->
+      <div v-if="libraryFeeRequirements.isOverdueOrLost">
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          Accession Number <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.accessionNumber"
+          type="text"
+          placeholder="Enter Accession Number"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.accessionNumber ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p v-if="validationErrors.accessionNumber" class="text-xs text-red-500 mt-1">
+          {{ validationErrors.accessionNumber }}
+        </p>
+      </div>
+      <div v-if="libraryFeeRequirements.isOverdueOrLost">
+        </div>
+
+      <div v-else-if="libraryFeeRequirements.isInternetFee">
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          Number of Hours <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.numberOfHours"
+          type="number"
+          placeholder="Enter Number of Hours"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.numberOfHours ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p v-if="validationErrors.numberOfHours" class="text-xs text-red-500 mt-1">
+          {{ validationErrors.numberOfHours }}
+        </p>
+      </div>
+
+      <div v-else-if="libraryFeeRequirements.isNonUPPrivate">
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          Number of Days <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.numberOfDays"
+          type="number"
+          placeholder="Enter Number of Days"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.numberOfDays ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p v-if="validationErrors.numberOfDays" class="text-xs text-red-500 mt-1">
+          {{ validationErrors.numberOfDays }}
+        </p>
+      </div>
+      
+      <div v-else-if="libraryFeeRequirements.isPhotocopyPrintingScanning">
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          Number of Pages <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.numberOfPages"
+          type="number"
+          placeholder="Enter Number of Pages"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.numberOfPages ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p v-if="validationErrors.numberOfPages" class="text-xs text-red-500 mt-1">
+          {{ validationErrors.numberOfPages }}
+        </p>
+      </div>
+      
+      <div 
+        v-if="libraryFeeRequirements.isAlumniResearchersFee"
+        :class="{
+          'md:col-span-2': !fieldRequirements.isNotCashPayment, // Span 2 if Cash
+          'md:col-span-2': fieldRequirements.isNotCashPayment // Span 1 if not Cash (to make space for Reference ID)
+        }"
+      >
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          {{ amountLabel }} <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.amount"
+          type="number"
+          placeholder="Enter amount"
+          class="p-2 border rounded-lg w-full"
+          :class="validationErrors.amount ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p v-if="validationErrors.amount" class="text-xs text-red-500 mt-1">
+          {{ validationErrors.amount }}
+        </p>
+      </div>
+
+      <div 
+        v-if="libraryFeeRequirements.isAlumniResearchersFee && fieldRequirements.isNotCashPayment"
+      >
+        <label class="block text-sm font-bold text-gray-700 mb-1">
+          Reference Number / Payment ID <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="data.paymentReferenceNumber"
+          type="text"
+          placeholder="Transaction ID / Reference Number"
+          required
+          class="p-2 border rounded-lg w-full"
+          :class="
+            validationErrors.paymentReferenceNumber
+              ? 'border-red-500'
+              : 'border-gray-300'
+          "
+        />
+        <p
+          v-if="validationErrors.paymentReferenceNumber"
+          class="text-xs text-red-500 mt-1"
+        >
+          {{ validationErrors.paymentReferenceNumber }}
+        </p>
+      </div>
+
       <div v-if="fieldRequirements.isFacilities" class="md:col-span-2">
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Facilities Reference Number <span class="text-red-500">*</span>
@@ -182,10 +344,9 @@ watch(
         </p>
       </div>
 
-      <!-- Amount -->
-      <div>
+      <div v-if="!libraryFeeRequirements.isAlumniResearchersFee">
         <label class="block text-sm font-bold text-gray-700 mb-1">
-          Amount <span class="text-red-500">*</span>
+          {{ amountLabel }} <span class="text-red-500">*</span>
         </label>
         <input
           v-model="data.amount"
@@ -199,8 +360,7 @@ watch(
         </p>
       </div>
 
-      <!-- Reference Number (for non-cash) -->
-      <div v-if="fieldRequirements.isNotCashPayment">
+      <div v-if="fieldRequirements.isNotCashPayment && !libraryFeeRequirements.isAlumniResearchersFee">
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Reference Number / Payment ID <span class="text-red-500">*</span>
         </label>
@@ -233,3 +393,4 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 </style>
+

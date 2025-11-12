@@ -34,12 +34,12 @@ const cardData = ref([
             :key="card.title"
             class="shadow-xl rounded-lg overflow-hidden" 
         >
-            <div :class="card.headerBgColor" class="p-4 text-white text-md  font-semibold rounded-t-lg ">
+            <div :class="card.headerBgColor" class="p-4 text-white text-sm sm:text-base md:text-lg font-semibold rounded-t-lg w-auto h-auto truncate ">
                 {{ card.title }}
             </div>
 
             <div class="bg-white p-4 rounded-b-lg h-full">
-                <p class="text-4xl font-extrabold mb-1">₱{{ card.value }}</p>
+                <p class="md:text-2xl font-extrabold mb-1">₱{{ card.value }}</p>
                 <p :class="card.percentageColor" class="text-sm font-medium">{{ card.percentageChange }}</p>
             </div>
         </div>

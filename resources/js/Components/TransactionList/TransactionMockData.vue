@@ -1,12 +1,12 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import axios from 'axios'; 
+import axios from 'axios'; //used axios in TrnasactionListAxios.vue
 //Transaction Table import
 import TransactionDataCell from './TransactionDataCell.vue';
 import TransactionStatusCell from './TransactionStatusCell.vue';
 //Modals
-import PaymentDetailsModal from '../Modals/ReceiptModal.vue';
-import StatusUpdateModal from '../Modals/StatusUpdateModal.vue';
+import PaymentDetailsModal from './ReceiptModal.vue';
+import StatusUpdateModal from './StatusUpdateModal.vue';
 import ConfirmationModal from './ConfirmationModal.vue'; 
 //DatePicker Component
 import DatePicker from './DatePicker.vue'; 
@@ -16,7 +16,7 @@ import { MOCK_TRANSACTION_DATA } from '@/MockData.js';
 
 
 //receipt
-import ViewDetails from './ViewDetails.vue' // View Details modal import
+import ViewDetails from './ViewDetailsModal.vue' // View Details modal import
 
 const showViewDetailsModal = ref(false)
 const selectedViewDetails = ref({})
@@ -312,11 +312,10 @@ const cancelUpdate = () => {
 };
 
 
-
-
 </script>
 
 <template>
+    <!-- <pre>{{ MOCK_TRANSACTION_DATA }}</pre> -->
     <div class="bg-white p-5 rounded-lg shadow-xl">
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2  mt-0.1">
@@ -324,7 +323,7 @@ const cancelUpdate = () => {
 
             <div class="flex flex-wrap items-end gap-x-4 gap-y-3 flex-grow justify-end min-w-0">
                 
-                <div class="flex flex-col items-start w-[135px]">
+                <div class="flex flex-col items-start w-[8.438rem]">
                     <label for="start-date" class="text-xs font-semibold text-gray-700 mb-1">From</label>
                     <div class="relative w-full">
                         <input 
@@ -341,7 +340,7 @@ const cancelUpdate = () => {
                     </div>
                 </div>
                 
-                <div class="flex flex-col items-start w-[135px]">
+                <div class="flex flex-col items-start w-[8.438rem]">
                     <label for="end-date" class="text-xs font-semibold text-gray-700 mb-1">To</label>
                     <div class="relative w-full">
                         <input 
@@ -358,7 +357,7 @@ const cancelUpdate = () => {
                     </div>
                 </div>
 
-                <div class="relative w-[268px] sm:max-w-xs md:max-w-[300px]">
+                <div class="relative w-[16.75rem] sm:max-w-xs md:max-w-[18.75rem]">
                     <label for="search-input" class="sr-only">Search Transactions</label>
                     <input 
                         type="search" 
@@ -437,7 +436,7 @@ const cancelUpdate = () => {
                                 @click="openPaymentDetailsModal(transaction)"
                                 class="bg-green-900 hover:bg-green-700 text-white text-xs font-normal py-1.5 px-3 rounded-lg flex items-center justify-center transition duration-150 shadow-md"
                             >
-                                <SVG icon-name="Print" container-class="h-3 w-3 mr-4 -mt-1.5 text-white "> </SVG>
+                                <SVG icon-name="Print" container-class="h-3 w-3 mr-4 -mt-1.5 text-white "> </SVG> 
                                 Receipt
                             </button>
                             
@@ -455,7 +454,7 @@ const cancelUpdate = () => {
         </div>
         
             <div class="flex justify-end mt-3.5">
-                <button class="flex items-center rounded-lg shadow-lg py-2 px-4 bg-brand-maroon hover:bg-brand-maroon-hover text-white text-xs font-semibold transition duration-150">
+                <button class="flex items-center rounded-lg shadow-lg py-2 px-4 bg-brand-maroon hover:bg-brand-maroon-hover focus:bg-brand-maroon-focus text-white text-xs font-semibold transition duration-150">
                    <span>Generate Report</span>
                      <SVG icon-name="Print" container-class="ml-1 h-4 text-white "> </SVG>
                 </button>

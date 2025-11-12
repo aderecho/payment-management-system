@@ -1,5 +1,6 @@
 // Mock Data for auto fill, mock data for TransactionMockData.vue
 
+export let studentDataForAutofill = [];
 
 export const MOCK_TRANSACTION_DATA = [
     {
@@ -140,7 +141,7 @@ export const MOCK_TRANSACTION_DATA = [
         paymentMethod: 'Maya',
         transactionType: 'Tuition Fee',
         amount: 18000.00,
-        date: '09/01/2025',
+        date: '09/01/2022',
         status: 'Cancelled',
         course: 'MS Astrophysics',
         yearLevel: '1st Year Grad', 
@@ -152,7 +153,7 @@ export const MOCK_TRANSACTION_DATA = [
 ];
 
 // Export a specific subset of data for the autofill process
-export const studentDataForAutofill = MOCK_TRANSACTION_DATA.map(t => ({
+studentDataForAutofill = MOCK_TRANSACTION_DATA.map(t => ({
     campusId: t.campusId,
     name: t.studentName, // Note the mapping: studentName -> name
     course: t.course,

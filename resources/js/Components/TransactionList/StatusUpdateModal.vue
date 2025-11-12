@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, defineEmits, computed, ref, watch } from 'vue';
+import { defineProps, defineEmits, computed, ref, watch, onUnmounted } from 'vue';
 
 const props = defineProps({
   show: { type: Boolean, required: true },
@@ -28,7 +28,7 @@ const editableStatus = ref(props.statusDetails.status);
 const statusOptions = ['Pending', 'Floating', 'Posted', 'Cancelled'];
 const dropdownOpen = ref(false);
 const warningMessage = ref('');
-const isPosted = computed(() => editableStatus.value === 'Posted'); // ✅ Reactive computed
+const isPosted = computed(() => editableStatus.value === 'Posted');
 
 watch(
   () => props.statusDetails.status,
@@ -44,6 +44,23 @@ watch(editableStatus, (newStatus) => {
       newStatus,
     });
   }
+});
+
+// 💡 Disable page scroll when modal is open
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      document.body.style.overflow = 'hidden'; // disable background scroll
+    } else {
+      document.body.style.overflow = ''; // restore scroll
+    }
+  }
+);
+
+// 💡 Clean up on unmount
+onUnmounted(() => {
+  document.body.style.overflow = '';
 });
 
 const formatAmount = (amount) => {
@@ -80,8 +97,9 @@ const statusColors = {
     v-if="show"
     class="fixed inset-0 z-50 flex items-center justify-center p-2 bg-gray-900 bg-opacity-60 transition-all duration-200"
   >
+    <!-- Modal Box -->
     <div
-      class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 border border-gray-200 transform transition-all duration-300"
+      class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto p-6 border border-gray-200 transform transition-all duration-300"
     >
       <!-- ❌ Close Button -->
       <button
@@ -103,10 +121,10 @@ const statusColors = {
 
       <!-- 🧾 Header -->
       <div class="text-center mb-4">
-        <h2 class="text-2xl font-extrabold text-[#6a0d1b]">Update Status</h2>
+        <h2 class="text-2xl font-extrabold text-[#6a0d1b]">Status</h2>
       </div>
 
-      <!-- 📋 Details -->
+      <!-- 📋 Scrollable Content -->
       <div class="space-y-3 text-sm text-gray-700">
         <div
           v-for="item in detailItems"
@@ -151,7 +169,7 @@ const statusColors = {
             <!-- Dropdown Menu -->
             <div
               v-if="dropdownOpen"
-              class="absolute right-0 z-50 mt-1 rounded-md border border-gray-300 shadow-lg overflow-hidden"
+              class="absolute right-0 z-50 mt-1 rounded-md border border-gray-300 shadow-lg overflow-hidden bg-white"
             >
               <div
                 v-for="option in statusOptions"

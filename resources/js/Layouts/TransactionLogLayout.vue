@@ -3,10 +3,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
-import TransactionMockData from '@/Components/TransactionList/TransactionMockData.vue';
-// import PaymentCards from '@/Components/PaymentCards.vue'; 
-// import TransactionList from '@/Components/dump/TransactionList.vue';  Import with axios
-// Note: SVG component is imported in Sidebar.vue
+// import TransactionMockData from '@/Components/TransactionList/TransactionMockData.vue';
+import TransactionListAxios from '@/Components/TransactionList/TransactionListAxios.vue';
 
 const menuItems = [
     { name: "Dashboard", icon: "Dashboard", route: "/DashboardPage" },
@@ -63,8 +61,9 @@ const closeSidebarOnLeave = () =>{
             }">
 
     
-            <!-- <TransactionList /> -->
-            <TransactionMockData />
+            
+            <!-- <TransactionMockData /> -->
+            <TransactionListAxios />
           
              
         </main>

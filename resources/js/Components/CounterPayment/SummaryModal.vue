@@ -16,16 +16,16 @@ const confirmPayment = () => emit("confirm");
   >
     <!-- Modal Container -->
     <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl transform transition-all"
+      class="bg-white rounded-xl shadow-2xl w-full max-w-3xl transform transition-all"
     >
       <!-- Header -->
       <div
-        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-brand-maroon text-white rounded-t-2xl"
+        class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-brand-maroon text-white rounded-t-xl"
       >
         <div class="flex items-center space-x-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 text-brand-gold"
+            class="h-5 w-5 text-brand-gold"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -37,13 +37,13 @@ const confirmPayment = () => emit("confirm");
               d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.418 2 2.83V16m1-9V7m0 9v1m4-8a4 4 0 11-8 0 4 4 0 018 0z"
             />
           </svg>
-          <h3 class="text-2xl font-bold text-brand-gold">
+          <h3 class="text-lg font-semibold text-brand-gold">
             Payment Summary & Confirmation
           </h3>
         </div>
         <button
           @click="$emit('close')"
-          class="text-white hover:text-brand-gold text-2xl font-bold px-2"
+          class="text-white hover:text-brand-gold text-xl font-bold px-2"
           aria-label="Close"
         >
           ✕
@@ -51,15 +51,15 @@ const confirmPayment = () => emit("confirm");
       </div>
 
       <!-- Body -->
-      <div class="grid grid-cols-2 gap-4 px-4 py-2 text-gray-900 text-base">
+      <div class="grid grid-cols-2 gap-3 px-4 py-3 text-gray-900 text-sm">
         <!-- LEFT: Transaction Details -->
-        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h4
-            class="flex items-center text-lg font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-4"
+            class="flex items-center text-base font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 text-brand-gold mr-2"
+              class="h-4 w-4 text-brand-gold mr-1.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -73,13 +73,13 @@ const confirmPayment = () => emit("confirm");
             </svg>
             Transaction Details
           </h4>
-          <dl class="space-y-3 text-[1rem] leading-relaxed">
+          <dl class="space-y-2 text-[0.9rem] leading-relaxed">
             <div class="flex justify-between">
-              <dt class="font-medium">Transaction Type</dt>
+              <dt class="font-medium">Type</dt>
               <dd>{{ formData.transactionType }}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="font-medium">Payment Method</dt>
+              <dt class="font-medium">Payment</dt>
               <dd>{{ formData.paymentMethod }}</dd>
             </div>
             <div class="flex justify-between">
@@ -87,7 +87,7 @@ const confirmPayment = () => emit("confirm");
               <dd>{{ formData.purpose }}</dd>
             </div>
             <div
-              class="flex justify-between text-brand-maroon font-bold text-lg border-t border-gray-300 pt-2"
+              class="flex justify-between text-brand-maroon font-bold text-base border-t border-gray-300 pt-1.5"
             >
               <dt>Amount</dt>
               <dd>
@@ -107,20 +107,20 @@ const confirmPayment = () => emit("confirm");
               <dd>{{ formData.facilitiesReferenceNumber }}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="font-medium">Reference No. / Payment ID</dt>
+              <dt class="font-medium">Ref / Payment ID</dt>
               <dd>{{ formData.paymentReferenceNumber || "N/A" }}</dd>
             </div>
           </dl>
         </div>
 
         <!-- RIGHT: Personal Information -->
-        <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h4
-            class="flex items-center text-lg font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-4"
+            class="flex items-center text-base font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 text-brand-gold mr-2"
+              class="h-4 w-4 text-brand-gold mr-1.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -134,7 +134,7 @@ const confirmPayment = () => emit("confirm");
             </svg>
             Personal Information
           </h4>
-          <dl class="space-y-3 text-[1rem] leading-relaxed">
+          <dl class="space-y-2 text-[0.9rem] leading-relaxed">
             <div class="flex justify-between">
               <dt class="font-medium">Campus ID</dt>
               <dd>{{ formData.campusId }}</dd>
@@ -175,32 +175,31 @@ const confirmPayment = () => emit("confirm");
 
       <!-- Warning Note -->
       <div
-        class="mx-8 my-4 p-4 bg-brand-gold/10 border-l-4 border-brand-gold text-brand-maroon text-base rounded-lg"
+        class="mx-6 my-3 p-3 bg-brand-gold/10 border-l-4 border-brand-gold text-brand-maroon text-sm rounded-md"
       >
-        ⚠️ <strong>Important:</strong> Clicking
-        <strong>Confirm Payment</strong> registers this transaction.
-        <br />
-        Please ensure your payment is already made for non-cash methods.
+        ⚠️ <strong>Note:</strong> Click
+        <strong>Confirm Payment</strong> to register this transaction.
+        Ensure your payment is made for non-cash methods.
       </div>
 
       <!-- Footer -->
       <div
-        class="flex justify-end space-x-4 px-8 py-5 bg-gray-100 border-t rounded-b-2xl"
+        class="flex justify-end space-x-3 px-6 py-4 bg-gray-100 border-t rounded-b-xl"
       >
         <button
           @click="$emit('close')"
-          class="px-6 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 text-lg font-medium hover:bg-gray-200 transition"
+          class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 text-sm font-medium hover:bg-gray-200 transition"
         >
           Cancel / Edit
         </button>
         <button
           @click="confirmPayment"
-          class="px-6 py-3 rounded-lg bg-brand-green-dark text-white text-lg font-semibold hover:bg-brand-green-dark-hover transition"
+          class="px-4 py-2 rounded-md bg-brand-green-dark text-white text-sm font-semibold hover:bg-brand-green-dark-hover transition"
         >
-          <div class="flex items-center justify-center space-x-2">
+          <div class="flex items-center justify-center space-x-1.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5"
+              class="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -55,6 +55,11 @@ const formData = ref({
   orName: '',
   paymentReferenceNumber: '',
   facilitiesReferenceNumber: '',
+  // New fields for Library Fees & Fines
+  accessionNumber: '',
+  numberOfHours: '',
+  numberOfDays: '',
+  numberOfPages: '',
 });
 
 const validationErrors = ref({});
@@ -81,6 +86,30 @@ const handleSubmitForm = () => {
     if (!formData.value.yearLevel) errors.yearLevel = 'Year Level is required';
     if (!formData.value.schoolYear) errors.schoolYear = 'School Year is required';
   }
+
+  // Conditional requirements for Library Fees & Fines
+  if (type === 'University Library-Fees & Fines') {
+    const purpose = formData.value.purpose;
+
+    // Overdue Books / Lost Books
+    if (purpose === 'Overdue Books' || purpose === 'Lost Books') {
+      if (!formData.value.accessionNumber) errors.accessionNumber = 'Accession Number is required';
+    }
+    // Internet Fee
+    else if (purpose === 'Internet Fee') {
+      if (!formData.value.numberOfHours) errors.numberOfHours = 'Number of Hours is required';
+    }
+    // Alumni and Researchers Fee (Amount already validated)
+    // Non-UP (Private)
+    else if (purpose === 'Non-UP (Private)') {
+      if (!formData.value.numberOfDays) errors.numberOfDays = 'Number of Days is required';
+    }
+    // Photocopy, Printing, and Scanning
+    else if (purpose === 'Photocopy' || purpose === 'Printing' || purpose === 'Scanning') {
+      if (!formData.value.numberOfPages) errors.numberOfPages = 'Number of Pages is required';
+    }
+  }
+
   //Reference Number / Payment ID is required if chosen is NOT Cash
   if (method && method !== 'Cash' && !formData.value.paymentReferenceNumber) {
       errors.paymentReferenceNumber = 'Reference Number / Payment ID is required';
@@ -107,14 +136,14 @@ const closeSummary = () => (showSummaryModal.value = false);
 </script>
 
 <template>
-  <div class="min-h-screen  bg-gray-100 flex flex-col">
+  <div class="min-h-screen  bg-gray-100 flex flex-col">
     <NavHeader @toggleSidebar="toggleSidebar" />
     <div class="flex-1 flex">
       <Sidebar
         :menu-items="menuItems"
         :is-sidebar-open="isSidebarOpen"
-         @mouseenter="openSidebarOnEnter"
-         @mouseleave="closeSidebarOnLeave"
+          @mouseenter="openSidebarOnEnter"
+          @mouseleave="closeSidebarOnLeave"
       />
       <main class="flex-1 transition-all duration-300 p-4 min-w-0"
         :class="{ 'lg:ml-[12.5rem]': isSidebarOpen, 'lg:ml-[4.5rem]': !isSidebarOpen }">
