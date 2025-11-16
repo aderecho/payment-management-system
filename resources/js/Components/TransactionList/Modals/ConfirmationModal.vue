@@ -97,7 +97,7 @@ const handleCancel = () => {
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <button 
                             type="button" 
-                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition duration-150 ease-in-out"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition duration-500 ease-in-out"
                             @click="handleConfirm"
                         >
                             {{ confirmText }}
@@ -116,23 +116,5 @@ const handleCancel = () => {
     </Transition>
 </template>
 
-<style scoped>
-/* Modal transition styles for smooth entry/exit */
-.modal-enter-active,
-.modal-leave-active {
-    transition: all 0.3s ease;
-}
 
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.9);
-}
-
-.modal-enter-to,
-.modal-leave-from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-</style> 
 

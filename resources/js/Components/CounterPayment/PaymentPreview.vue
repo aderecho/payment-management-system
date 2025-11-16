@@ -18,7 +18,6 @@ const paymentDisplay = computed(() => {
 </script>
 
 <template>
-  <!-- ✅ Fully responsive container -->
   <div
     class="bg-white flex flex-col items-center justify-center  
            border border-gray-200 rounded-xl shadow-lg 
@@ -27,16 +26,7 @@ const paymentDisplay = computed(() => {
            transition-all duration-300 
             top-1 "
   >
-    <!-- Title -->
-    <!-- <h2
-      class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-4 text-center leading-tight"
-    >
-      {{ formData.paymentMethod === 'Cash'
-        ? 'Cash Payment Instructions'
-        : `Scan QR Code: ${formData.paymentMethod}` }}
-    </h2> -->
 
-    <!-- QR or Instructions -->
     <div
       v-if="paymentDisplay"
       class="flex flex-col items-center justify-center w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
@@ -51,7 +41,6 @@ const paymentDisplay = computed(() => {
       </p>
     </div>
 
-    <!-- Cash payment message -->
     <p
       v-else-if="formData.paymentMethod === 'Cash'"
       class="text-gray-600 text-center text-sm sm:text-base md:text-lg mt-4"
@@ -61,23 +50,4 @@ const paymentDisplay = computed(() => {
   </div>
 </template>
 
-<style scoped>
-/* Make sure images resize correctly */
-img {
-  max-width: 100%;
-  height: auto;
-}
 
-/* Smooth scaling when zooming or resizing */
-@media (max-width: 768px) {
-  div {
-    padding: 1rem !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  div {
-    transition: all 0.3s ease-in-out;
-  }
-}
-</style>

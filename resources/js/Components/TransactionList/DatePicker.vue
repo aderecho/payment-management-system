@@ -5,7 +5,7 @@ import { ref, computed } from 'vue';
 const props = defineProps({
     // The model to bind the selected date to (e.g., startDate or endDate)
     modelValue: {
-        type: String, // YYYY-MM-DD format
+        type: String, // (MM-DD-YYYY) format
         default: '',
     },
     // Used to determine if the picker is for the start or end date
@@ -48,7 +48,7 @@ const currentView = ref('day');
 // Initialize picker to the date passed in via modelValue
 const initializePickerDate = () => {
     if (props.modelValue) {
-        // Parse current value (YYYY-MM-DD)
+        // Parse current value (MM-DD-YYYY)
         const dateParts = props.modelValue.split('-');
         currentSelectedYear.value = parseInt(dateParts[0]);
         currentSelectedMonthIndex.value = parseInt(dateParts[1]) - 1; 
@@ -73,7 +73,6 @@ initializePickerDate();
 
 
 // --- COMPUTED PROPERTIES ---
-
 /**
  * Computed property for the year list, ordered MIN_YEAR (top) to CURRENT_YEAR (bottom).
  */
@@ -161,8 +160,8 @@ const navigateCalendar = (direction) => {
 
         // Prevent navigating past the current year/month
         const today = new Date();
-        const futureDate = new Date(newYear, newMonthIndex);
-        if (futureDate > new Date(today.getFullYear(), today.getMonth())) {
+        const futuredate = new Date(newYear, newMonthIndex);
+        if (futuredate > new Date(today.getFullYear(), today.getMonth())) {
             currentSelectedYear.value = today.getFullYear();
             currentSelectedMonthIndex.value = today.getMonth();
         } else if (newYear < props.minYearWithData) {
@@ -181,7 +180,7 @@ const navigateCalendar = (direction) => {
         let newYearIndex;
         
         if (direction > 0) {
-             // Move to the year that would start the next block
+              // Move to the year that would start the next block
             newYearIndex = Math.min(availableYears.value.length - 1, currentYearIndex + yearBlockSize);
         } else {
             // Move to the year that would start the previous block
@@ -286,8 +285,8 @@ defineExpose({
                     :class="[
                         'py-2 rounded-lg text-sm font-medium transition-colors duration-150',
                         currentSelectedMonthIndex === index 
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-blue-500 hover:text-white'
+                            ? 'bg-brand-maroon text-white shadow-md' // CHANGED FROM bg-red-600
+                            : 'text-gray-700 hover:bg-brand-maroon hover:text-white' // CHANGED FROM hover:bg-red-500
                     ]"
                 >
                     {{ month }}
@@ -302,7 +301,7 @@ defineExpose({
                     :class="[
                         'py-2 px-3 text-base transition-colors duration-150 cursor-pointer text-center rounded-md',
                         year === currentSelectedYear
-                            ? 'bg-blue-600 text-white font-semibold'
+                            ? 'bg-brand-maroon text-white font-semibold' // CHANGED FROM bg-red-600
                             : 'text-gray-700 hover:bg-gray-100'
                     ]"
                 >
@@ -323,9 +322,9 @@ defineExpose({
                             dayItem === null ? 'pointer-events-none' : '',
                             dayItem && dayItem.isDisabled ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer',
                             dayItem && !dayItem.isDisabled && currentSelectedDay === dayItem.day
-                                ? 'bg-blue-600 text-white shadow-md'
+                                ? 'bg-brand-maroon text-white shadow-md' // CHANGED FROM bg-red-900
                                 : dayItem && !dayItem.isDisabled && dayItem.isToday
-                                    ? 'bg-gray-100 text-blue-600 border border-blue-600'
+                                    ? 'bg-gray-100 text-brand-maroon border border-brand-maroon' // CHANGED FROM text-red-600 border-red-600
                                     : dayItem && !dayItem.isDisabled
                                         ? 'text-gray-700 hover:bg-gray-100'
                                         : ''
@@ -338,10 +337,8 @@ defineExpose({
             </div>
 
             <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end items-center space-x-4">
-                <button @click="clearDates" class="text-sm font-semibold text-red-500 hover:text-red-700">Clear Dates</button>
-                <button @click="$emit('close')" class="text-sm text-gray-600 hover:text-gray-800">Close</button>
-                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Apply</button>
-            </div>
+                <button @click="clearDates" class="text-sm font-semibold text-brand-maroon hover:text-brand-maroon-hover">Clear Dates</button> <button @click="$emit('close')" class="text-sm text-gray-600 hover:text-gray-800">Close</button>
+                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-brand-maroon text-white rounded-md hover:bg-brand-maroon-hover">Apply</button> </div>
         </div>
     </div>
 </template>
@@ -349,20 +346,20 @@ defineExpose({
 <style scoped>
 /* Custom scrollbar for year view */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+    background: #f1f1f1;
+    border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
+    background: #ccc;
+    border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #999;
+    background: #999;
 }
 </style>

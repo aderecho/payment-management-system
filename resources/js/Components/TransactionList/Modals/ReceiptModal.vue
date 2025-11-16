@@ -1,7 +1,6 @@
-<!-- RECEIPT MODAL -->
 <script setup>
-import { defineProps, defineEmits, computed, ref } from 'vue'
-import SVG from '../SVG.vue';
+import { defineProps, defineEmits, computed, ref, watch } from 'vue' // Added 'watch'
+import SVG from '@/Components/SVG.vue';
 
 const printContentRef = ref(null)
 
@@ -29,6 +28,22 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'print'])
+
+// --- SCROLL LOCK LOGIC ---
+watch(
+  () => props.show,
+  (newValue) => {
+    if (newValue) {
+      // Modal is opening: Disable body scroll
+      document.body.classList.add('overflow-hidden')
+    } else {
+      // Modal is closing: Re-enable body scroll
+      document.body.classList.remove('overflow-hidden')
+    }
+  },
+  { immediate: true } // Run once immediately in case the component starts open
+)
+// -------------------------
 
 const formatAmount = (amount) => {
   const num = parseFloat(amount)
@@ -131,11 +146,11 @@ const descriptionItems = computed(() => [
 <template>
   <div
     v-if="show"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 p-2"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60 p-2 "
   >
     <div
       ref="printContentRef"
-      class="relative bg-white rounded-lg shadow-2xl w-full max-w-xs p-5 border border-gray-200"
+      class="relative bg-white rounded-lg shadow-2xl w-full max-w-xs max-h-full  p-5 border border-gray-200 overflow-auto"
     >
       <!-- Close Button -->
       <button
@@ -218,7 +233,7 @@ const descriptionItems = computed(() => [
           class="px-3 py-1.5 text-sm bg-[#6a0d1b] text-white rounded-md hover:bg-[#510a15] transition-colors flex items-center gap-1"
         >
           <span>Print</span>
-               <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"> </SVG>
+          <SVG icon-name="Print" container-class="ml-1 mb-2 h-4 text-white flex items-center"> </SVG>
         </button>
       </div>
     </div>

@@ -46,7 +46,7 @@ const isActive = (route) => page.url.startsWith(route);
                     <SVG 
                         :icon-name="item.icon" 
                         container-class="w-6 h-6 text-[#3A3434] text-base"
-                    />
+                    ></SVG>
                     
                     <span 
                         :class="{'opacity-100 max-w-xs': isSidebarOpen, 'opacity-0 max-w-0': !isSidebarOpen}"

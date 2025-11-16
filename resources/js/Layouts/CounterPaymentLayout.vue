@@ -71,23 +71,30 @@ const handleSubmitForm = () => {
   const type = formData.value.transactionType;
   const method = formData.value.paymentMethod;
 
-  // Always required
+  // Always required fields
   if (!type) errors.transactionType = 'Transaction Type is required';
   if (!formData.value.paymentMethod) errors.paymentMethod = 'Payment Method is required';
   if (!formData.value.purpose) errors.purpose = 'Purpose is required';
   if (!formData.value.amount) errors.amount = 'Amount is required';
   if (!formData.value.name) errors.name = 'Name is required';
-  if (!formData.value.campusId) errors.campusId = 'Campus ID is required';
   if (!formData.value.email) errors.email = 'Email is required';
 
-  // Conditional requirements
+  // --- CONDITIONAL REQUIREMENTS ---
+
+  // 1. Enrollment Related (Requires Campus ID, Course, Year Level, School Year)
   if (type === 'University Enrollment Related') {
+    if (!formData.value.campusId) errors.campusId = 'Campus ID is required';
     if (!formData.value.course) errors.course = 'Course is required';
     if (!formData.value.yearLevel) errors.yearLevel = 'Year Level is required';
     if (!formData.value.schoolYear) errors.schoolYear = 'School Year is required';
   }
 
-  // Conditional requirements for Library Fees & Fines
+  // 2. Facilities Transaction (Requires Facilities Reference Number)
+  if (type === 'UP Cebu Facilities, Other Equipment and Vehicle Registration') {
+    if (!formData.value.facilitiesReferenceNumber) errors.facilitiesReferenceNumber = 'Facilities Reference Number is required';
+  }
+
+  // 3. Library Fees & Fines
   if (type === 'University Library-Fees & Fines') {
     const purpose = formData.value.purpose;
 
@@ -99,7 +106,6 @@ const handleSubmitForm = () => {
     else if (purpose === 'Internet Fee') {
       if (!formData.value.numberOfHours) errors.numberOfHours = 'Number of Hours is required';
     }
-    // Alumni and Researchers Fee (Amount already validated)
     // Non-UP (Private)
     else if (purpose === 'Non-UP (Private)') {
       if (!formData.value.numberOfDays) errors.numberOfDays = 'Number of Days is required';
@@ -110,11 +116,12 @@ const handleSubmitForm = () => {
     }
   }
 
-  //Reference Number / Payment ID is required if chosen is NOT Cash
+  // 4. Reference Number / Payment ID is required if chosen is NOT Cash
   if (method && method !== 'Cash' && !formData.value.paymentReferenceNumber) {
       errors.paymentReferenceNumber = 'Reference Number / Payment ID is required';
     }
 
+  // 5. OR Name
   if (!formData.value.isNameOnOR && !formData.value.orName) {
     errors.orName = 'Name to appear on OR is required';
   }

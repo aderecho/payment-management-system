@@ -1,4 +1,5 @@
 <script setup>
+import SVG from '../SVG.vue';
 const props = defineProps({
   formData: Object,
 });
@@ -16,27 +17,14 @@ const confirmPayment = () => emit("confirm");
   >
     <!-- Modal Container -->
     <div
-      class="bg-white rounded-xl shadow-2xl w-full max-w-3xl transform transition-all"
+      class="bg-white rounded-xl shadow-2xl w-full max-w-3xl transform transition-all overflow-y-auto"
     >
       <!-- Header -->
       <div
         class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-brand-maroon text-white rounded-t-xl"
       >
         <div class="flex items-center space-x-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-brand-gold"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 8c-1.657 0-3 1.343-3 3 0 1.306.835 2.418 2 2.83V16m1-9V7m0 9v1m4-8a4 4 0 11-8 0 4 4 0 018 0z"
-            />
-          </svg>
+          <SVG iconName="PaymentSummary" containerClass="h-5 w-5 text-brand-gold"></SVG>
           <h3 class="text-lg font-semibold text-brand-gold">
             Payment Summary & Confirmation
           </h3>
@@ -46,7 +34,8 @@ const confirmPayment = () => emit("confirm");
           class="text-white hover:text-brand-gold text-xl font-bold px-2"
           aria-label="Close"
         >
-          ✕
+        <SVG iconName="Close" containerClass="h-5 w-5"></SVG>
+        
         </button>
       </div>
 
@@ -57,20 +46,7 @@ const confirmPayment = () => emit("confirm");
           <h4
             class="flex items-center text-base font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-3"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 text-brand-gold mr-1.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 7h18M3 12h18M3 17h18"
-              />
-            </svg>
+            <SVG iconName="TransactionDetails" containerClass="h-5 w-5 text-brand-gold"></SVG>
             Transaction Details
           </h4>
           <dl class="space-y-2 text-[0.9rem] leading-relaxed">
@@ -118,20 +94,7 @@ const confirmPayment = () => emit("confirm");
           <h4
             class="flex items-center text-base font-semibold text-brand-maroon border-b border-brand-gold pb-2 mb-3"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 text-brand-gold mr-1.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M5.121 17.804A8 8 0 1118.878 6.195M12 14l2 2m0-2l-2 2m0 0l-2-2m2 2V9"
-              />
-            </svg>
+            <SVG iconName="PersonalInfo" containerClass="h-5 w-5 text-brand-gold"></SVG>
             Personal Information
           </h4>
           <dl class="space-y-2 text-[0.9rem] leading-relaxed">
@@ -181,7 +144,6 @@ const confirmPayment = () => emit("confirm");
         <strong>Confirm Payment</strong> to register this transaction.
         Ensure your payment is made for non-cash methods.
       </div>
-
       <!-- Footer -->
       <div
         class="flex justify-end space-x-3 px-6 py-4 bg-gray-100 border-t rounded-b-xl"
@@ -197,20 +159,7 @@ const confirmPayment = () => emit("confirm");
           class="px-4 py-2 rounded-md bg-brand-green-dark text-white text-sm font-semibold hover:bg-brand-green-dark-hover transition"
         >
           <div class="flex items-center justify-center space-x-1.5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+             <SVG iconName="ConfirmPayment" containerClass="h-4 w-4"></SVG>
             <span>Confirm Payment</span>
           </div>
         </button>
@@ -219,23 +168,4 @@ const confirmPayment = () => emit("confirm");
   </div>
 </template>
 
-<style scoped>
-.text-brand-maroon {
-  color: #8a1538;
-}
-.bg-brand-maroon {
-  background-color: #8a1538;
-}
-.bg-brand-green-dark {
-  background-color: #00573f;
-}
-.hover\:bg-brand-green-dark-hover:hover {
-  background-color: #00402e;
-}
-.text-brand-gold {
-  color: #ffb81c;
-}
-.border-brand-gold {
-  border-color: #ffb81c;
-}
-</style>
+

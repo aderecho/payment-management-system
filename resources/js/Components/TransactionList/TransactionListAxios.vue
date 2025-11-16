@@ -5,9 +5,9 @@ import axios from 'axios' // 🔹 [ADDED FOR AXIOS DYNAMISM]
 // 🔹 COMPONENT IMPORTS
 import TransactionDataCell from '../TransactionList/TransactionDataCell.vue'
 import TransactionStatusCell from '../TransactionList/TransactionStatusCell.vue'
-import PaymentDetailsModal from '../TransactionList/ReceiptModal.vue'
-import StatusUpdateModal from '../TransactionList/StatusUpdateModal.vue'
-import ConfirmationModal from '../TransactionList/ConfirmationModal.vue'
+import PaymentDetailsModal from './Modals/ReceiptModal.vue'
+import StatusUpdateModal from './Modals/StatusUpdateModal.vue'
+import ConfirmationModal from './Modals/ConfirmationModal.vue'
 import DatePicker from '../TransactionList/DatePicker.vue'
 import ViewDetails from './ViewDetailsModal.vue'
 import SVG from '../SVG.vue'

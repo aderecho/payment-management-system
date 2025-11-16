@@ -1,5 +1,13 @@
 <script setup>
 import { computed, watch } from "vue";
+import SVG from "../SVG.vue";
+// Import Headless UI Listbox components
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from "@headlessui/vue";
 
 const props = defineProps({
   modelValue: Object,
@@ -58,15 +66,22 @@ watch(
 const isUniversityEnrollmentRelated = computed(() => {
   if (!data.value.transactionType) return false;
   const keywords = [
-    "University Enrollment",
-    "Enrollment",
-    "Admission",
-    "Registration",
+    "University Enrollment Related"
   ];
   return keywords.some((word) =>
     data.value.transactionType.toLowerCase().includes(word.toLowerCase())
   );
 });
+
+// Helper for displaying the currently selected course
+const selectedCourseDisplay = computed(() => {
+    return data.value.course || 'Select a Course'
+})
+
+// 💡 ADDED: Helper for displaying the currently selected year level
+const selectedYearLevelDisplay = computed(() => {
+    return data.value.yearLevel || 'Select Year Level'
+})
 </script>
 
 <template>
@@ -76,16 +91,25 @@ const isUniversityEnrollmentRelated = computed(() => {
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-      <!-- Campus ID -->
-      <div>
+      <div >
         <label class="block text-sm font-bold text-gray-700 mb-1">
-          Campus ID <span class="text-red-500">*</span>
+          Campus ID 
+          <span 
+          v-if="isUniversityEnrollmentRelated"
+          class="text-red-500">*</span>
+          <span
+            v-if="!isUniversityEnrollmentRelated"
+            class="text-gray-400 text-sm font-normal"
+          >
+            (Optional)
+          </span>
+         
         </label>
         <input
           v-model="data.campusId"
           type="text"
           placeholder="ex. 202500129"
-          class="p-2 border rounded-lg w-full"
+          class="p-2 border rounded-lg w-full focus:border-red-900 focus:ring-1 focus:ring-red-900"
           :class="validationErrors.campusId ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.campusId" class="text-xs text-red-500 mt-1">
@@ -93,10 +117,12 @@ const isUniversityEnrollmentRelated = computed(() => {
         </p>
       </div>
 
-      <!-- Course -->
-      <div>
+      <div class="relative">
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Course
+          <span 
+          v-if="isUniversityEnrollmentRelated"
+          class="text-red-500">*</span>
           <span
             v-if="!isUniversityEnrollmentRelated"
             class="text-gray-400 text-sm font-normal"
@@ -104,26 +130,62 @@ const isUniversityEnrollmentRelated = computed(() => {
             (Optional)
           </span>
         </label>
-        <select
-          v-model="data.course"
-          class="p-2 border rounded-lg w-full"
-          :class="validationErrors.course ? 'border-red-500' : 'border-gray-300'"
-        >
-          <option disabled value="">Select a Course</option>
-          <template v-for="(courses, category) in courseOptions" :key="category">
-            <optgroup :label="category">
-              <option v-for="course in courses" :key="course" :value="course">
-                {{ course }}
-              </option>
-            </optgroup>
-          </template>
-        </select>
+
+          <Listbox v-model="data.course" as="div" class="relative">
+            <ListboxButton 
+              class="border p-2 pr-6 rounded-lg w-full text-left relative truncate"
+              :class="[
+                validationErrors.course ? 'border-red-500' : 'border-gray-300 focus:border-red-900 focus:ring-1 focus:ring-red-900',
+                data.course ? 'text-gray-800' : 'text-gray-400'
+              ]"
+            >
+              {{ selectedCourseDisplay }}
+              <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 ">
+                <SVG icon-name="DropdownMenuArrow" ></SVG>
+              </span>
+            </ListboxButton>
+
+          <transition
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <template v-for="(courses, category) in courseOptions" :key="category">
+                <li class="px-3 py-2 text-xs font-bold text-gray-500 uppercase  top-0 bg-white">
+                  {{ category }}
+                </li>
+                <ListboxOption
+                  v-for="course in courses"
+                  :key="course"
+                  :value="course"
+                  as="template"
+                  v-slot="{ active, selected }"
+                >
+                  <li
+                    :class="[
+                      active ? 'bg-[#6a0d1b] text-white' : 'text-gray-900',
+                      'cursor-pointer select-none relative py-2 pl-3 pr-10'
+                    ]"
+                  >
+                    <span :class="[selected ? 'font-semibold' : 'font-normal', 'block']">
+                      {{ course }}
+                    </span>
+                    <span v-if="selected" class=" absolute inset-y-0 right-0 flex  items-center pr-3 text-[#6a0d1b]" :class="{ 'text-white': active }">
+                      <SVG icon-name="Check" ></SVG>
+                    </span>
+                  </li>
+                </ListboxOption>
+              </template>
+            </ListboxOptions>
+          </transition>
+        </Listbox>
+        
         <p v-if="validationErrors.course" class="text-xs text-red-500 mt-1">
           {{ validationErrors.course }}
         </p>
       </div>
 
-      <!-- Name -->
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Name: (Lastname, Firstname, MI) <span class="text-red-500">*</span>
@@ -132,7 +194,7 @@ const isUniversityEnrollmentRelated = computed(() => {
           v-model="data.name"
           type="text"
           placeholder="ex. Smith, John"
-          class="p-2 border rounded-lg w-full"
+          class="p-2 border rounded-lg w-full focus:border-red-900 focus:ring-1 focus:ring-red-900"
           :class="validationErrors.name ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.name" class="text-xs text-red-500 mt-1">
@@ -140,10 +202,12 @@ const isUniversityEnrollmentRelated = computed(() => {
         </p>
       </div>
 
-      <!-- Year Level -->
-      <div>
+      <div class="relative">
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Year Level
+          <span 
+          v-if="isUniversityEnrollmentRelated"
+          class="text-red-500">*</span>
           <span
             v-if="!isUniversityEnrollmentRelated"
             class="text-gray-400 text-sm font-normal"
@@ -151,22 +215,56 @@ const isUniversityEnrollmentRelated = computed(() => {
             (Optional)
           </span>
         </label>
-        <select
-          v-model="data.yearLevel"
-          class="p-2 border rounded-lg w-full"
-          :class="validationErrors.yearLevel ? 'border-red-500' : 'border-gray-300'"
-        >
-          <option disabled value="">Select Year Level</option>
-          <option v-for="level in yearLevelOptions" :key="level" :value="level">
-            {{ level }}
-          </option>
-        </select>
+        
+        <Listbox v-model="data.yearLevel" as="div" class="relative">
+          <ListboxButton 
+            class="border p-2 rounded-lg w-full text-left relative truncate"
+            :class="[
+              validationErrors.yearLevel ? 'border-red-500' : 'border-gray-300 focus:border-red-900 focus:ring-1 focus:ring-red-900',
+              data.yearLevel ? 'text-gray-800' : 'text-gray-400'
+            ]"
+          >
+            {{ selectedYearLevelDisplay }}
+            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <SVG icon-name="DropdownMenuArrow" ></SVG>
+            </span>
+          </ListboxButton>
+
+          <transition
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <ListboxOptions class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <ListboxOption
+                v-for="level in yearLevelOptions"
+                :key="level"
+                :value="level"
+                as="template"
+                v-slot="{ active, selected }"
+              > 
+                <li
+                  :class="[
+                    active ? 'bg-[#6a0d1b] text-white' : 'text-gray-900',
+                    'cursor-pointer select-none relative py-2 px-4'
+                  ]"
+                >
+                  <span :class="[selected ? 'font-semibold' : 'font-normal', 'block']">
+                    {{ level }}
+                  </span>
+                  <span v-if="selected" class=" absolute inset-y-0 right-0 flex items-center pr-3 text-[#6a0d1b]" :class="{ 'text-white': active }">
+                    <SVG icon-name="Check" ></SVG>
+                  </span>
+                </li>
+              </ListboxOption>
+            </ListboxOptions>
+          </transition>
+        </Listbox>
+
         <p v-if="validationErrors.yearLevel" class="text-xs text-red-500 mt-1">
           {{ validationErrors.yearLevel }}
         </p>
       </div>
-
-      <!-- Email -->
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           Email <span class="text-red-500">*</span>
@@ -175,7 +273,7 @@ const isUniversityEnrollmentRelated = computed(() => {
           v-model="data.email"
           type="email"
           placeholder="johnsmith@example.com"
-          class="p-2 border rounded-lg w-full"
+          class="p-2 border rounded-lg w-full focus:border-red-900 focus:ring-1 focus:ring-red-900"
           :class="validationErrors.email ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.email" class="text-xs text-red-500 mt-1">
@@ -183,10 +281,12 @@ const isUniversityEnrollmentRelated = computed(() => {
         </p>
       </div>
 
-      <!-- School Year -->
       <div>
         <label class="block text-sm font-bold text-gray-700 mb-1">
           School Year
+          <span 
+          v-if="isUniversityEnrollmentRelated"
+          class="text-red-500">*</span>
           <span
             v-if="!isUniversityEnrollmentRelated"
             class="text-gray-400 text-sm font-normal"
@@ -198,7 +298,7 @@ const isUniversityEnrollmentRelated = computed(() => {
           v-model="data.schoolYear"
           type="text"
           placeholder="ex. 2025-2026 1st Semester"
-          class="p-2 border rounded-lg w-full"
+          class="p-2 border rounded-lg w-full focus:border-red-900 focus:ring-1 focus:ring-red-900"
           :class="validationErrors.schoolYear ? 'border-red-500' : 'border-gray-300'"
         />
         <p v-if="validationErrors.schoolYear" class="text-xs text-red-500 mt-1">
@@ -206,7 +306,6 @@ const isUniversityEnrollmentRelated = computed(() => {
         </p>
       </div>
 
-      <!-- Name on OR -->
       <div class="md:col-span-2 mt-4 border p-3 rounded-lg bg-gray-50">
         <p class="block text-sm font-bold text-gray-700 mb-2">
           Does the above-mentioned name appear on the Original Receipt (OR)?
@@ -239,17 +338,16 @@ const isUniversityEnrollmentRelated = computed(() => {
         </div>
       </div>
 
-      <!-- OR Name -->
       <div v-if="data.isNameOnOR === false" class="md:col-span-2">
-        <label class="block text-sm font-bold text-gray-700 mb-1">
+        <label class="block text-sm font-bold text-gray-700 mb-1 ">
           Name to Appear on OR <span class="text-red-500">*</span>
         </label>
         <input
           v-model="data.orName"
           type="text"
           placeholder="Enter Name of Organization / Company"
-          class="p-2 border rounded-lg w-full"
-          :class="validationErrors.orName ? 'border-red-500' : 'border-gray-300'"
+          class="p-2 border rounded-lg w-full focus:border-red-900 focus:ring-1 focus:ring-red-900"
+          :class="validationErrors.orName ? 'border-red-500' : 'border-gray-300' "
         />
         <p v-if="validationErrors.orName" class="text-xs text-red-500 mt-1">
           {{ validationErrors.orName }}
@@ -257,7 +355,6 @@ const isUniversityEnrollmentRelated = computed(() => {
       </div>
     </div>
 
-    <!-- Buttons -->
     <div class="flex justify-end gap-3 mt-6">
       <button
         type="button"

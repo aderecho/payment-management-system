@@ -1,12 +1,10 @@
 <script setup>
-// Removed: import '@fortawesome/fontawesome-free/css/all.min.css'; 
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
 import PaymentCards from '@/Components/TransactionList/PaymentCards.vue'; 
-// import TransactionList from '@/Components/TransactionList.vue'; 
-import TransactionMockData from '@/Components/TransactionList/TransactionMockData.vue'; 
-// Note: SVG component is imported in Sidebar.vue
+import TransactionList from '@/Components/TransactionList/TransactionList.vue'; 
+//SVG component is imported in Sidebar.vue
 
 const menuItems = [
     // UPDATED: Changed icon to use SVG key from SVG.vue
@@ -70,8 +68,7 @@ const closeSidebarOnLeave = () => {
             >
             
             <PaymentCards />
-            <TransactionMockData />
-            <!-- <TransactionList /> -->
+            <TransactionList />
         </main>
     </div>
 </div>

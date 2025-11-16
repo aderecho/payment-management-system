@@ -3,8 +3,10 @@ import { defineProps, computed } from 'vue';
 
 const props = defineProps({
   status: {
+    default: 'Pending',
     type: String,
-    required: true
+
+    
   }
 });
 
@@ -19,7 +21,7 @@ const statusClasses = computed(() => {
             return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-200 text-yellow-800';
         case 'Cancelled':
             // Red  badge
-            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-200 text-yellow-800';
+            return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-200 text-red-800';
         
          default:
             // Default/Gray badge
