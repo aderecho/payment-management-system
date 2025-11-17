@@ -42,8 +42,6 @@ const transactionFields = computed(() => {
     { label: 'Processed By', key: 'processedBy', alternating: false },
   ];
 
-  // Filter out fields that don't have a value OR are not explicitly required to show if empty (like Type, Method, Purpose)
-  // And map the data for rendering
   return fields
     .filter(field => field.key === 'transactionType' || field.key === 'paymentMethod' || field.key === 'purpose' || props.details[field.key])
     .map(field => ({
@@ -52,7 +50,6 @@ const transactionFields = computed(() => {
     }));
 });
 
-// --- DATA MAPPING FOR PERSONAL INFORMATION ---
 const personalInfoFields = computed(() => {
     const fields = [
         { label: 'Campus ID', key: 'campusId' },

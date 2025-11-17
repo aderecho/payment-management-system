@@ -26,14 +26,13 @@ const formattedValue = computed(() => {
         return 'N/A';
     }
 
-    // Custom formatting logic for Boolean values (like isNameOnOR)
+    // logic for Boolean values (like isNameOnOR)
     if (typeof props.value === 'boolean') {
         return props.value ? 'Yes' : 'No';
     }
     
     // Custom formatting for amount
     if (props.isAmount) {
-        // Ensure the value is treated as a number for toFixed
         const numericValue = parseFloat(props.value);
         if (isNaN(numericValue)) return '₱0.00';
         // Use toLocaleString for proper thousand separators (assuming 'en-US' locale)

@@ -1,36 +1,22 @@
 <script setup>
 import { defineProps, defineEmits, computed, ref, watch, onUnmounted } from 'vue';
-import ConfirmationModal from './ConfirmationModal.vue'; // Assuming ConfirmationModal is in the same directory
+import ConfirmationModal from './ConfirmationModal.vue'; 
+import SVG from '@/Components/SVG.vue';
+import { useTransactionStore } from '@/stores/transactionStore.js';
 
-// NOTE: You will need to create and import a DetailRow.vue component for this to work
-// If DetailRow.vue is not available, replace DetailRow component usage in the template
-// with a simple key/value div structure like:
-// <div class="flex justify-between even:bg-gray-100 even:rounded p-1"><span class="font-medium text-gray-600">{{ item.key }}:</span><span>{{ item.value || 'N/A' }}</span></div>
+const store = useTransactionStore();
 
 const props = defineProps({
   show: { type: Boolean, required: true },
   statusDetails: {
     type: Object,
-    default: () => ({
-      campusId: '',
-      studentName: '',
-      email: '',
-      course: '',
-      yearLevel: '',
-      schoolYear: '',
-      referenceCode: '',
-      paymentMethod: '',
-      transactionType: '',
-      date: '',
-      status: '',
-      amount: 0,
-    }),
+    default: () => ({ }),
   },
 });
 
 const emit = defineEmits(['close', 'update-status', 'confirm-update']);
 
-// Status options & colors (using inline styles for DetailRow compatibility)
+// Status options and corresponding colors for display
 const statusOptions = ['Pending', 'Floating', 'Posted', 'Cancelled'];
 const statusColors = {
   Pending: { bg: '#e5e7eb', text: '#374151' },
@@ -39,6 +25,7 @@ const statusColors = {
   Cancelled: { bg: '#fecaca', text: '#7f1d1d' },
 };
 
+// Local state for status selection in the dropdown
 const editableStatus = ref(
   statusOptions.includes(props.statusDetails.status)
     ? props.statusDetails.status
@@ -48,33 +35,27 @@ const editableStatus = ref(
 const dropdownOpen = ref(false);
 const hasBeenUpdated = ref(false); 
 const showWarning = ref(false);
-
-// --- Confirmation Modal State ---
 const showConfirmationModal = ref(false);
 
-// Dropdown disabled if status is Posted or Cancelled in the details
+// editable for Pending/Floating, disabled for Posted/Cancelled.
 const isDropdownDisabled = computed(
   () => props.statusDetails.status === 'Posted' || props.statusDetails.status === 'Cancelled'
 );
 
+// Syncs the local editable status when the prop changes
 watch(() => props.statusDetails.status, (newStatus) => {
   editableStatus.value = statusOptions.includes(newStatus) ? newStatus : 'Pending';
-});
+}, { immediate: true });
 
 watch(editableStatus, (newStatus) => {
   if (newStatus !== props.statusDetails.status && statusOptions.includes(newStatus)) {
-    // The previous implementation was emitting 'update-status' on status change, 
-    // but the requirement is to confirm first. Removing this emit here.
-    // emit('update-status', {
-    //   referenceCode: props.statusDetails.referenceCode,
-    //   newStatus,
-    // });
     showWarning.value = newStatus === 'Posted';
   } else {
     showWarning.value = false;
   }
 });
 
+// Controls body scroll when modal is open
 watch(() => props.show, (val) => {
   document.body.style.overflow = val ? 'hidden' : '';
 });
@@ -83,70 +64,62 @@ onUnmounted(() => {
   document.body.style.overflow = '';
 });
 
-// Format amount (kept simple for template display)
+// Formats amount with currency symbol
 const formatAmount = (amount) => {
   if (typeof amount !== 'number' || isNaN(amount)) return '₱0.00';
   return `₱${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-// --- DATA MAPPING FOR TRANSACTION DETAILS (Similar to ViewDetailsModal) ---
+// Maps transaction data fields for display
 const transactionFields = computed(() => {
-    // Only include fields relevant for display/context in this smaller modal
     const fields = [
-        { label: 'Reference Code', key: 'referenceCode', alternating: true },
-        { label: 'Transaction Type', key: 'transactionType', alternating: true },
-        { label: 'Payment Method', key: 'paymentMethod', alternating: true },
-        { label: 'Transaction Date', key: 'date', alternating: false },
+      { label: 'Reference Code', key: 'referenceCode', alternating: true },
+      { label: 'Transaction Type', key: 'transactionType', alternating: true },
+      { label: 'Payment Method', key: 'paymentMethod', alternating: true },
+      { label: 'Transaction Date', key: 'date', alternating: false },
     ];
     
     return fields.map(field => ({
-        ...field,
-        value: props.statusDetails[field.key] || 'N/A',
+      ...field,
+      value: props.statusDetails[field.key] || 'N/A',
     }));
 });
 
-// --- DATA MAPPING FOR PERSONAL INFORMATION (Similar to ViewDetailsModal) ---
 const personalInfoFields = computed(() => {
     const fields = [
-        { label: 'Campus ID', key: 'campusId' },
-        { label: 'Name', key: 'studentName' },
-        { label: 'Email', key: 'email' },
-        { label: 'Course', key: 'course' },
-        { label: 'Year Level', key: 'yearLevel' },
-        { label: 'School Year', key: 'schoolYear' },
+      { label: 'Campus ID', key: 'campusId' },
+      { label: 'Name', key: 'studentName' },
+      { label: 'Email', key: 'email' },
+      { label: 'Course', key: 'course' },
+      { label: 'Year Level', key: 'yearLevel' },
+      { label: 'School Year', key: 'schoolYear' },
     ];
     
     return fields.map(field => ({
-        label: field.label,
-        value: props.statusDetails[field.key] || 'N/A',
+      label: field.label,
+      value: props.statusDetails[field.key] || 'N/A',
     }));
 });
 
-// NEW: Show confirmation modal
 const confirmUpdate = () => {
     showConfirmationModal.value = true;
 };
 
-// NEW: Handle final confirmation (Yes, Update)
 const handleFinalUpdate = () => {
     showConfirmationModal.value = false;
-    // Emit the event to the parent component/store to execute the actual update
-    emit('confirm-update', { ...props.statusDetails, status: editableStatus.value });
 
-    // Close the StatusUpdateModal only after confirmation
+    // Direct call to the Pinia action to update the status
+    store.updateStatus(props.statusDetails.referenceCode, editableStatus.value);
+
+    // Close the StatusUpdateModal only after the final confirmation is sent
     emit('close'); 
 };
 
-// NEW: Handle cancellation (No, Cancel)
 const handleCancelConfirmation = () => {
-    // Hide the confirmation modal
     showConfirmationModal.value = false;
-    // Keep the editableStatus as it was changed by the dropdown, but do NOT emit the update.
-    // The requirement "the status must remain the same" refers to the *saved* status, 
-    // which is accomplished by not emitting the update.
 };
 
-// Computed property for confirmation modal message
+// Computed property for confirmation modal message, including a warning for 'Posted'
 const confirmationMessage = computed(() => {
     let base = `Are you sure you want to change the status of "${props.statusDetails.studentName}" from "${props.statusDetails.status}" to "${editableStatus.value}"?`;
     if (editableStatus.value === 'Posted') {
@@ -171,9 +144,7 @@ const confirmationMessage = computed(() => {
             @click="emit('close')"
             class="absolute top-2 right-2 text-gray-400 hover:text-[#6a0d1b] rounded-full transition-all duration-200"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <SVG icon-name="Close"></SVG>
           </button>
 
           <div class="text-center mb-3 sm:mb-4">
@@ -263,7 +234,7 @@ const confirmationMessage = computed(() => {
                 <div
                   v-for="field in personalInfoFields"
                   :key="field.label"
-                  class="flex justify-between p-1"
+                  class="flex justify-between p-1 even:bg-gray-100 even:rounded"
                 >
                   <span class="font-medium text-gray-600">{{ field.label }}:</span>
                   <span>{{ field.value }}</span>
@@ -277,13 +248,10 @@ const confirmationMessage = computed(() => {
               @click="confirmUpdate"
               :disabled="statusDetails.status === editableStatus"
               :class="[
-                  // Added transition-all and increased duration for smoothness
-                  'px-4 py-1.5 text-xs sm:text-sm font-semibold text-white rounded-md shadow-sm **transition-all duration-300 ease-in-out**',
-                  statusDetails.status === editableStatus 
-                      // Disabled state: Added opacity and cursor
-                      ? 'bg-gray-400 **cursor-not-allowed opacity-70**' 
-                      // Enabled state: Hover/focus effects with distinct color and shadow
-                      : 'bg-[#6a0d1b] hover:bg-[#510a15] focus:ring-2 focus:ring-[#6a0d1b]/40 **hover:shadow-lg**'
+                'px-4 py-1.5 text-xs sm:text-sm font-semibold text-white rounded-md shadow-sm transition-all duration-300 ease-in-out',
+                statusDetails.status === editableStatus 
+                    ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                    : 'bg-[#6a0d1b] hover:bg-[#510a15] focus:ring-2 focus:ring-[#6a0d1b]/40 hover:shadow-lg'
               ]"
             >
               Confirm Status Update

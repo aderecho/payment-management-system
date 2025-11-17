@@ -3,7 +3,6 @@ import { defineProps } from 'vue';
 
 defineProps({
   value: {
-    // Accepts any data type, as it will be converted to a string in the template
     type: [String, Number, Boolean], 
     required: true
   }

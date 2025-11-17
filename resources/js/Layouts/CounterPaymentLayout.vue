@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue';
 import Sidebar from '@/Components/Sidebar.vue';
-import TransactionDetails from '@/Components/CounterPayment/TransactionDetails.vue';
+import TransactionDetails from '@/Components/CounterPayment/forms/TransactionDetailsForms.vue';
 import PersonalInformation from '@/Components/CounterPayment/PersonalInformation.vue';
 import PaymentPreview from '@/Components/CounterPayment/PaymentPreview.vue';
 import SummaryModal from '@/Components/CounterPayment/SummaryModal.vue';

@@ -1,33 +1,27 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-// Define the component's props
 const props = defineProps({
-    // The model to bind the selected date to (e.g., startDate or endDate)
     modelValue: {
-        type: String, // (MM-DD-YYYY) format
+        type: String,
         default: '',
     },
-    // Used to determine if the picker is for the start or end date
     target: {
-        type: String, // 'start' or 'end'
+        type: String,
         required: true,
     },
-    // The year of the oldest transaction data
     minYearWithData: {
         type: Number,
         required: true,
     },
 });
 
-// Define the events the component can emit
 const emit = defineEmits([
-    'update:modelValue', 
-    'close', 
-    'clear-all-dates' // Custom event for clearing both dates
+    'update:modelValue',
+    'close',
+    'clear-all-dates'
 ]);
 
-// --- CONSTANTS ---
 const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -36,46 +30,29 @@ const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 const currentYear = new Date().getFullYear(); 
 const todayDateString = new Date().toISOString().slice(0, 10);
 
-// --- COMPONENT LOCAL STATES ---
 const currentSelectedYear = ref(currentYear);
-const currentSelectedMonthIndex = ref(new Date().getMonth()); // 0-indexed
-const currentSelectedDay = ref(null); // State for selected day
+const currentSelectedMonthIndex = ref(new Date().getMonth());
+const currentSelectedDay = ref(null);
 
-// State for current view in the picker: 'day', 'month', 'year'
 const currentView = ref('day'); 
 
-
-// Initialize picker to the date passed in via modelValue
 const initializePickerDate = () => {
     if (props.modelValue) {
-        // Parse current value (MM-DD-YYYY)
         const dateParts = props.modelValue.split('-');
         currentSelectedYear.value = parseInt(dateParts[0]);
         currentSelectedMonthIndex.value = parseInt(dateParts[1]) - 1; 
         currentSelectedDay.value = parseInt(dateParts[2]);
     } else {
-        // Default to current date/month/year
         const today = new Date();
         currentSelectedYear.value = currentYear;
         currentSelectedMonthIndex.value = today.getMonth();
-        currentSelectedDay.value = today.getDate(); // Default to today's day
+        currentSelectedDay.value = today.getDate();
     }
-    // Always start with day view when opened/initialized
     currentView.value = 'day'; 
 };
 
-// Call initialization when component mounts or a value changes (if necessary for external changes, 
-// but since it's a modal, initialization can be manual right before display)
-// NOTE: TransactionMockData.vue calls this manually via openYearPicker 
-// which is now the responsibility of the parent to manage the modal state and initial values.
-// We'll call it once initially for a safe default state.
 initializePickerDate();
 
-
-// --- COMPUTED PROPERTIES ---
-/**
- * Computed property for the year list, ordered MIN_YEAR (top) to CURRENT_YEAR (bottom).
- */
 const availableYears = computed(() => {
     const years = [];
     const minYear = props.minYearWithData; 
@@ -85,30 +62,24 @@ const availableYears = computed(() => {
     return years; 
 });
 
-// Computed property to generate the day grid
 const daysInMonthGrid = computed(() => {
     const year = currentSelectedYear.value;
-    const monthIndex = currentSelectedMonthIndex.value; // 0-indexed month
+    const monthIndex = currentSelectedMonthIndex.value;
     
-    // Get the last day of the current month (day 0 of the next month)
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
     
-    // Get the day of the week for the first day of the month (0=Sunday, 6=Saturday)
-    // Adjust to make Monday=0, Sunday=6
     const firstDayOfMonth = (new Date(year, monthIndex, 1).getDay() + 6) % 7; 
 
     const grid = [];
     
-    // Add placeholders for days before the 1st
     for (let i = 0; i < firstDayOfMonth; i++) {
         grid.push(null);
     }
 
-    // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, monthIndex, day);
         const isToday = date.toDateString() === new Date().toDateString();
-        const isPastMax = date > new Date(); // Disable future dates
+        const isPastMax = date > new Date();
         
         grid.push({
             day: day,
@@ -120,29 +91,23 @@ const daysInMonthGrid = computed(() => {
     return grid;
 });
 
-// --- NAVIGATION FUNCTIONS ---
-
-// Navigates to month view
 const navigateToMonthView = () => {
     currentView.value = 'month';
 };
 
-// Navigates to year view
 const navigateToYearView = () => {
     currentView.value = 'year';
 };
 
-// Select year from year list
 const selectYear = (year) => {
     currentSelectedYear.value = year;
-    currentView.value = 'month'; // After selecting year, go to month view
+    currentView.value = 'month';
 };
 
-// Select month from month grid
 const selectMonth = (monthIndex) => {
     currentSelectedMonthIndex.value = monthIndex;
-    currentSelectedDay.value = null; // Reset day selection on month/year change
-    currentView.value = 'day'; // After selecting month, go to day view
+    currentSelectedDay.value = null;
+    currentView.value = 'day';
 };
 
 const navigateCalendar = (direction) => {
@@ -158,7 +123,6 @@ const navigateCalendar = (direction) => {
             newYear--;
         }
 
-        // Prevent navigating past the current year/month
         const today = new Date();
         const futuredate = new Date(newYear, newMonthIndex);
         if (futuredate > new Date(today.getFullYear(), today.getMonth())) {
@@ -166,24 +130,21 @@ const navigateCalendar = (direction) => {
             currentSelectedMonthIndex.value = today.getMonth();
         } else if (newYear < props.minYearWithData) {
             currentSelectedYear.value = props.minYearWithData;
-            currentSelectedMonthIndex.value = 0; // Jan of min year
+            currentSelectedMonthIndex.value = 0;
         }
         else {
             currentSelectedYear.value = newYear;
             currentSelectedMonthIndex.value = newMonthIndex;
         }
-        currentSelectedDay.value = null; // Reset day selection when navigating month/year
+        currentSelectedDay.value = null;
     } else if (currentView.value === 'year') {
-        // For year view, navigate by a block of years (e.g., 12 years)
-        const yearBlockSize = 12; // Or adjust as needed
+        const yearBlockSize = 12;
         const currentYearIndex = availableYears.value.findIndex(y => y === currentSelectedYear.value);
         let newYearIndex;
         
         if (direction > 0) {
-              // Move to the year that would start the next block
             newYearIndex = Math.min(availableYears.value.length - 1, currentYearIndex + yearBlockSize);
         } else {
-            // Move to the year that would start the previous block
             newYearIndex = Math.max(0, currentYearIndex - yearBlockSize);
         }
 
@@ -191,21 +152,18 @@ const navigateCalendar = (direction) => {
     }
 };
 
-// Function to select a specific day
 const selectDay = (day) => {
     if (!day || day.isDisabled) return;
     currentSelectedDay.value = day.day;
-    applySelectedDate(true); // Apply and close instantly
+    applySelectedDate(true);
 };
 
-// Function to apply the selected date and update the model
 const applySelectedDate = (shouldClose = false) => {
     const year = currentSelectedYear.value;
     const month = String(currentSelectedMonthIndex.value + 1).padStart(2, '0');
     
-    let day = String(currentSelectedDay.value || 1).padStart(2, '0'); // Use selected day or default to 01
+    let day = String(currentSelectedDay.value || 1).padStart(2, '0');
     
-    // If the target is 'end' and no day is explicitly selected, set to the last day of the month
     if (props.target === 'end' && !currentSelectedDay.value) {
         const lastDay = new Date(year, currentSelectedMonthIndex.value + 1, 0).getDate();
         day = String(lastDay).padStart(2, '0');
@@ -213,7 +171,6 @@ const applySelectedDate = (shouldClose = false) => {
 
     const newDate = `${year}-${month}-${day}`;
 
-    // Prevent setting a date beyond today
     if (new Date(newDate) <= new Date(todayDateString)) {
         emit('update:modelValue', newDate);
     } else {
@@ -229,8 +186,6 @@ const clearDates = () => {
     emit('clear-all-dates');
 }
 
-
-// Expose the initialize function for the parent to call when the picker is opened
 defineExpose({
     initializePickerDate
 });
@@ -285,8 +240,8 @@ defineExpose({
                     :class="[
                         'py-2 rounded-lg text-sm font-medium transition-colors duration-150',
                         currentSelectedMonthIndex === index 
-                            ? 'bg-brand-maroon text-white shadow-md' // CHANGED FROM bg-red-600
-                            : 'text-gray-700 hover:bg-brand-maroon hover:text-white' // CHANGED FROM hover:bg-red-500
+                            ? 'bg-brand-maroon text-white shadow-md'
+                            : 'text-gray-700 hover:bg-brand-maroon hover:text-white'
                     ]"
                 >
                     {{ month }}
@@ -301,7 +256,7 @@ defineExpose({
                     :class="[
                         'py-2 px-3 text-base transition-colors duration-150 cursor-pointer text-center rounded-md',
                         year === currentSelectedYear
-                            ? 'bg-brand-maroon text-white font-semibold' // CHANGED FROM bg-red-600
+                            ? 'bg-brand-maroon text-white font-semibold'
                             : 'text-gray-700 hover:bg-gray-100'
                     ]"
                 >
@@ -322,9 +277,9 @@ defineExpose({
                             dayItem === null ? 'pointer-events-none' : '',
                             dayItem && dayItem.isDisabled ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer',
                             dayItem && !dayItem.isDisabled && currentSelectedDay === dayItem.day
-                                ? 'bg-brand-maroon text-white shadow-md' // CHANGED FROM bg-red-900
+                                ? 'bg-brand-maroon text-white shadow-md'
                                 : dayItem && !dayItem.isDisabled && dayItem.isToday
-                                    ? 'bg-gray-100 text-brand-maroon border border-brand-maroon' // CHANGED FROM text-red-600 border-red-600
+                                    ? 'bg-gray-100 text-brand-maroon border border-brand-maroon'
                                     : dayItem && !dayItem.isDisabled
                                         ? 'text-gray-700 hover:bg-gray-100'
                                         : ''
@@ -337,14 +292,15 @@ defineExpose({
             </div>
 
             <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end items-center space-x-4">
-                <button @click="clearDates" class="text-sm font-semibold text-brand-maroon hover:text-brand-maroon-hover">Clear Dates</button> <button @click="$emit('close')" class="text-sm text-gray-600 hover:text-gray-800">Close</button>
-                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-brand-maroon text-white rounded-md hover:bg-brand-maroon-hover">Apply</button> </div>
+                <button @click="clearDates" class="text-sm font-semibold text-brand-maroon hover:text-brand-maroon-hover">Clear Dates</button>
+                <button @click="$emit('close')" class="text-sm text-gray-600 hover:text-gray-800">Close</button>
+                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-brand-maroon text-white rounded-md hover:bg-brand-maroon-hover">Apply</button>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-/* Custom scrollbar for year view */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }

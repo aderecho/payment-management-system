@@ -6,22 +6,22 @@ const cardData = ref([
         title: "Student University Enrollment Related",
         value: "45,678.90",
         percentageChange: "-20% month over month",
-        headerBgColor: "bg-brand-maroon", // Maroon
-        percentageColor: "text-red-600" // Adjusted for better visibility on white background
+        headerBgColor: "bg-brand-maroon", // Maroon from tailwind.config.js
+        percentageColor: "text-red-600" 
     },
     {
         title: "Library-Fees and Fines",
         value: "2,405",
         percentageChange: "+33% month over month",
-        headerBgColor: "bg-brand-green-dark", // Dark Green
-        percentageColor: "text-green-600" // Adjusted for better visibility on white background
+        headerBgColor: "bg-brand-green-dark", 
+        percentageColor: "text-green-600" 
     },
     {
         title: "Facilities, Equipments & Vehicle Registration",
         value: "10,353",
         percentageChange: "-8% month over month",
-        headerBgColor: "bg-brand-gold", // Yellow/Orange
-        percentageColor: "text-red-600" // Adjusted for better visibility on white background
+        headerBgColor: "bg-brand-gold", 
+        percentageColor: "text-red-600" 
     },
 ]);
 </script>

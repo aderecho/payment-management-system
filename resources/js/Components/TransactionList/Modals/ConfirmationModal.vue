@@ -2,42 +2,22 @@
 import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
-    /**
-     * Controls the visibility of the modal.
-     * @type {boolean}
-     */
     show: {
         type: Boolean,
         default: false,
     },
-    /**
-     * The main message/question displayed in the modal body.
-     * @type {string}
-     */
     message: {
         type: String,
         required: true,
     },
-    /**
-     * Text for the confirmation (primary) button.
-     * @type {string}
-     */
     confirmText: {
         type: String,
         default: 'Confirm',
     },
-    /**
-     * Text for the cancellation (secondary) button.
-     * @type {string}
-     */
     cancelText: {
         type: String,
         default: 'Cancel',
     },
-    /**
-     * Title text for the modal header.
-     * @type {string}
-     */
     title: {
         type: String,
         default: 'Confirmation Required',
@@ -46,16 +26,10 @@ const props = defineProps({
 
 const emit = defineEmits(['confirm', 'cancel']);
 
-/**
- * Handles the confirmation button click and emits the 'confirm' event.
- */
 const handleConfirm = () => {
     emit('confirm');
 };
 
-/**
- * Handles the cancel button click or backdrop click (if enabled) and emits the 'cancel' event.
- */
 const handleCancel = () => {
     emit('cancel');
 };
@@ -115,6 +89,3 @@ const handleCancel = () => {
         </div>
     </Transition>
 </template>
-
-
-

@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
-import PaymentCards from '@/Components/TransactionList/PaymentCards.vue'; 
+import PaymentCards from '@/Components/PaymentCards.vue'; 
 import TransactionList from '@/Components/TransactionList/TransactionList.vue'; 
 //SVG component is imported in Sidebar.vue
 

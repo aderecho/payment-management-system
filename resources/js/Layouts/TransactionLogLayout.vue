@@ -2,8 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue'; 
 import Sidebar from '@/Components/Sidebar.vue';
-// import TransactionMockData from '@/Components/TransactionList/TransactionList.vue';
-import TransactionListAxios from '@/Components/TransactionList/TransactionListAxios.vue';
+
+import TransactionListAxios from '@/Components/TransactionList/TransactionList.vue';
 
 const menuItems = [
     { name: "Dashboard", icon: "Dashboard", route: "/DashboardPage" },
