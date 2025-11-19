@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import NavHeader from '@/Components/NavHeader.vue';
 import Sidebar from '@/Components/Sidebar.vue';
-import TransactionDetails from '@/Components/CounterPayment/forms/TransactionDetailsForms.vue';
+import TransactionDetailsForms from '@/Components/CounterPayment/forms/TransactionDetailsForms.vue';
 import PersonalInformation from '@/Components/CounterPayment/PersonalInformation.vue';
 import PaymentPreview from '@/Components/CounterPayment/PaymentPreview.vue';
 import SummaryModal from '@/Components/CounterPayment/SummaryModal.vue';
@@ -55,7 +55,7 @@ const formData = ref({
   orName: '',
   paymentReferenceNumber: '',
   facilitiesReferenceNumber: '',
-  // New fields for Library Fees & Fines
+  // Fields for Library Fees & Fines
   accessionNumber: '',
   numberOfHours: '',
   numberOfDays: '',
@@ -65,13 +65,12 @@ const formData = ref({
 const validationErrors = ref({});
 const showSummaryModal = ref(false);
 
-// FORM VALIDATION
 const handleSubmitForm = () => {
   const errors = {};
   const type = formData.value.transactionType;
   const method = formData.value.paymentMethod;
 
-  // Always required fields
+  // required fields
   if (!type) errors.transactionType = 'Transaction Type is required';
   if (!formData.value.paymentMethod) errors.paymentMethod = 'Payment Method is required';
   if (!formData.value.purpose) errors.purpose = 'Purpose is required';
@@ -79,9 +78,6 @@ const handleSubmitForm = () => {
   if (!formData.value.name) errors.name = 'Name is required';
   if (!formData.value.email) errors.email = 'Email is required';
 
-  // --- CONDITIONAL REQUIREMENTS ---
-
-  // 1. Enrollment Related (Requires Campus ID, Course, Year Level, School Year)
   if (type === 'University Enrollment Related') {
     if (!formData.value.campusId) errors.campusId = 'Campus ID is required';
     if (!formData.value.course) errors.course = 'Course is required';
@@ -89,12 +85,12 @@ const handleSubmitForm = () => {
     if (!formData.value.schoolYear) errors.schoolYear = 'School Year is required';
   }
 
-  // 2. Facilities Transaction (Requires Facilities Reference Number)
+  // Facilities Transaction (Requires Facilities Reference Number)
   if (type === 'UP Cebu Facilities, Other Equipment and Vehicle Registration') {
     if (!formData.value.facilitiesReferenceNumber) errors.facilitiesReferenceNumber = 'Facilities Reference Number is required';
   }
 
-  // 3. Library Fees & Fines
+  //  Library Fees & Fines
   if (type === 'University Library-Fees & Fines') {
     const purpose = formData.value.purpose;
 
@@ -116,12 +112,12 @@ const handleSubmitForm = () => {
     }
   }
 
-  // 4. Reference Number / Payment ID is required if chosen is NOT Cash
+  // Reference Number / Payment ID is required if chosen is NOT Cash
   if (method && method !== 'Cash' && !formData.value.paymentReferenceNumber) {
       errors.paymentReferenceNumber = 'Reference Number / Payment ID is required';
     }
 
-  // 5. OR Name
+  // OR Name
   if (!formData.value.isNameOnOR && !formData.value.orName) {
     errors.orName = 'Name to appear on OR is required';
   }
@@ -155,10 +151,9 @@ const closeSummary = () => (showSummaryModal.value = false);
       <main class="flex-1 transition-all duration-300 p-4 min-w-0"
         :class="{ 'lg:ml-[12.5rem]': isSidebarOpen, 'lg:ml-[4.5rem]': !isSidebarOpen }">
     
-
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full mt-16">
           <div class="lg:col-span-3 space-y-4">
-            <TransactionDetails 
+            <TransactionDetailsForms
               v-model="formData"
               :validation-errors="validationErrors"
             />

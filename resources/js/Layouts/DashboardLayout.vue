@@ -7,7 +7,6 @@ import TransactionList from '@/Components/TransactionList/TransactionList.vue';
 //SVG component is imported in Sidebar.vue
 
 const menuItems = [
-    // UPDATED: Changed icon to use SVG key from SVG.vue
     { name: "Dashboard", icon: "Dashboard", route: "/DashboardPage" },
     { name: "Counter Payment", icon: "Counter Payment", route: "/CounterPaymentPage" },
     { name: "Transaction Log", icon: "Transaction Log", route: "/TransactionLogPage" },
@@ -31,14 +30,12 @@ const toggleSidebar = () => {
 
 // HANDLERS FOR MOUSE EVENTS
 const openSidebarOnEnter = () => {
-    // Only expand if we are not on a mobile screen
     if (!isMobile.value) {
         isSidebarOpen.value = true;
     }
 };
 
 const closeSidebarOnLeave = () => {
-    // Collapse to icon view when mouse leaves, but only on desktop
     if (!isMobile.value) {
         isSidebarOpen.value = false;
     }

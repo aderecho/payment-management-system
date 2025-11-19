@@ -21,7 +21,6 @@ const props = defineProps({
 });
 
 const formattedValue = computed(() => {
-    // Check for null/undefined/empty string first, returning 'N/A' if needed
     if (props.value === null || props.value === undefined || props.value === '') {
         return 'N/A';
     }

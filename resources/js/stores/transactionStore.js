@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
-import { MOCK_TRANSACTION_DATA } from '@/MockData.js';
+import { MOCK_TRANSACTION_DATA } from './MockData.js';
 
 export const useTransactionStore = defineStore('transactionStore', () => {
   // --- STATE ---

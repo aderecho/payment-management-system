@@ -2,12 +2,10 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 
-// --- Configuration ---
 const API_BASE_URL = 'http://api.yourdomain.com/v1/transactions';
 
 export const useTransactionStore = defineStore('transactionStore', () => {
 
-  // --- STATE ---
   const transactions = ref([]);
   const isLoading = ref(false);
   const fetchError = ref(null);
@@ -36,10 +34,6 @@ export const useTransactionStore = defineStore('transactionStore', () => {
     }
   };
 
-  /**
-   * Updates status via Axios PATCH. Uses an optimistic update approach 
-   * and rolls back state if the API call fails.
-   */
   const updateStatus = async (referenceCode, newStatus) => {
     fetchError.value = null;
     
@@ -66,7 +60,6 @@ export const useTransactionStore = defineStore('transactionStore', () => {
     }
   };
 
-  // --- DEBOUNCE SEARCH QUERY ---
   let debounceTimeout = null;
   watch(searchQuery, (newQuery) => {
     clearTimeout(debounceTimeout);
@@ -78,7 +71,6 @@ export const useTransactionStore = defineStore('transactionStore', () => {
   // --- HELPER FUNCTION ---
   const toDate = (dateString) => {
     if (!dateString) return new Date(0);
-    // Assumes date format MM/DD/YYYY
     const [month, day, year] = dateString.split('/');
     return new Date(year, month - 1, day);
   };
@@ -122,7 +114,6 @@ export const useTransactionStore = defineStore('transactionStore', () => {
     return filteredList;
   });
 
-  // --- RETURN STORE PROPERTIES & ACTIONS ---
   return {
     transactions,
     isLoading,

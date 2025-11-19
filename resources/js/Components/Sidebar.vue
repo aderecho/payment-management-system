@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue';
 import { Link, usePage } from "@inertiajs/vue3";
-// ADDED: Import the SVG component
+// SVG import
 import SVG from '@/Components/SVG.vue'; 
 
 const props = defineProps({
@@ -15,9 +15,7 @@ const props = defineProps({
     }
 });
 
-// Define emits for mouse events to communicate with the parent
 const emit = defineEmits(['mouseenter', 'mouseleave']);
-
 const page = usePage();
 
 const isActive = (route) => page.url.startsWith(route);
@@ -27,7 +25,6 @@ const isActive = (route) => page.url.startsWith(route);
     <aside 
         :class="[
             'bg-white shadow-lg transition-all duration-300 ease-in-out z-30',
-            // Use width classes for collapsed/expanded states
             props.isSidebarOpen ? 'w-49' : 'w-16', 
             'fixed top-16 bottom-0' 
         ]"

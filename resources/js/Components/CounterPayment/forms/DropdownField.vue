@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from 'vue';
-// NOTE: Make sure the path to SVG.vue is correct for your project structure
 import SVG from '../../SVG.vue'; 
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/vue";
 

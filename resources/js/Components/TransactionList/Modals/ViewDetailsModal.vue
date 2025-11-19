@@ -70,12 +70,10 @@ const personalInfoFields = computed(() => {
         .map(field => {
             let value = props.details[field.key];
             
-            // Handle alias/fallback for name
             if (field.key === 'name' && !value && field.alias) {
                 value = props.details[field.alias[0]];
             }
             
-            // Handle boolean values
             if (field.isBoolean) {
                 value = props.details[field.key] ? 'Yes' : 'No';
             }
@@ -84,7 +82,6 @@ const personalInfoFields = computed(() => {
                 label: field.label,
                 value: value,
                 isAmount: field.isAmount || false,
-                // Personal info rows do not need alternating backgrounds in this structure
             };
         });
 });

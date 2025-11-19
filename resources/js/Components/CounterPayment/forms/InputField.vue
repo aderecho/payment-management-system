@@ -6,7 +6,7 @@ const props = defineProps({
   label: String,
   placeholder: {
     type: String,
-    default: 'Enter value',
+    default: 'Enter Amount',
   },
   type: {
     type: String,
