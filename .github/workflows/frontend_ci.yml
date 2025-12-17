@@ -1,0 +1,46 @@
+  name: Frontend CI Pipeline
+
+  # Trigger the workflow on pushes and pull requests to the main branches
+  on:
+    push:
+      branches: [ main, master ]
+    pull_request:
+      branches: [ main, master ]
+
+  jobs:
+    build-and-lint:
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: 1. Checkout repository code
+          uses: actions/checkout@v4
+
+        # Setup Node.js 20 (Current LTS and suitable for your modern stack)
+        - name: 2. Setup Node.js environment
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20.x'
+
+        # Implement caching for speed. This key is based on the hash of your package-lock.json.
+        - name: 3. Cache Node Modules
+          uses: actions/cache@v4
+          id: npm-cache
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              ${{ runner.os }}-node-
+
+        # Use 'npm ci' (Clean Install) for CI environments. It strictly follows package-lock.json
+        - name: 4. Install Dependencies
+          run: npm ci
+
+        # --- Quality Gates: Linting ---
+        # This step ensures code quality based on your 'lint' script.
+        - name: 5. Run Linter (Code Quality Check)
+          run: npm run lint
+          
+        # --- Build Artifacts ---
+        # This step verifies that the production build succeeds.
+        - name: 6. Run Production Build
+          run: npm run build

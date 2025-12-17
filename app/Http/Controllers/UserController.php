@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -12,7 +13,8 @@ class UserController extends Controller
     // Injected UserService for handling business logic
     protected $service;
 
-    public function __construct(UserService $service) {
+    public function __construct(UserService $service)
+    {
         $this->service = $service;
     }
 
@@ -38,14 +40,16 @@ class UserController extends Controller
     /**
      * Show the form for creating a new user.
      */
-    public function create() {
+    public function create()
+    {
         return view('users.create');
     }
 
     /**
      * Store a newly created user in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         // Validate incoming request data
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -66,7 +70,8 @@ class UserController extends Controller
     /**
      * Display the specified user.
      */
-    public function show($id) {
+    public function show($id)
+    {
         // Retrieve and transform the user
         $user = $this->service->getUserById($id);
         return view('users.show', ['user' => UserTransformer::transform($user)]);
@@ -75,7 +80,8 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified user.
      */
-    public function edit($id) {
+    public function edit($id)
+    {
         // Fetch user for editing
         $user = $this->service->getUserById($id);
         return view('users.edit', ['user' => $user]);
@@ -84,7 +90,8 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         // Find the user
         $user = $this->service->getUserById($id);
 
@@ -104,7 +111,8 @@ class UserController extends Controller
     /**
      * Remove the specified user from storage.
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         // Fetch and delete the user
         $user = $this->service->getUserById($id);
         $this->service->deleteUser($user);

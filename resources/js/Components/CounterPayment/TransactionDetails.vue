@@ -15,13 +15,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-// Data model synchronization
 const data = computed({
   get: () => props.modelValue,
   set: (v) => emit('update:modelValue', v),
 });
 
-// Constants for transaction type keys
 const TRANSACTION_KEY = {
   ENROLLMENT: 'University Enrollment Related',
   LIBRARY: 'University Library-Fees & Fines',
@@ -52,7 +50,6 @@ const libraryOptions = [
   ...PURPOSE_KEY.PHOTOCOPY_ETC,
 ];
 
-
 // Purpose dropdown options (derived from transactionType)
 const purposeOptions = computed(() => {
   if (data.value.transactionType === TRANSACTION_KEY.ENROLLMENT)
@@ -63,7 +60,6 @@ const purposeOptions = computed(() => {
 });
 const isPurposeDropdown = computed(() => purposeOptions.value.length > 0);
 
-// Dynamic label for the main Purpose field
 const purposeLabel = computed(() => {
   const type = data.value.transactionType;
   if (type === TRANSACTION_KEY.LIBRARY) {
@@ -75,7 +71,6 @@ const purposeLabel = computed(() => {
 });
 
 
-// Grouped logic for Library Fees (relies on purpose)
 const libraryFeeRequirements = computed(() => {
   const type = data.value.transactionType;
   const purpose = data.value.purpose;
@@ -92,7 +87,6 @@ const libraryFeeRequirements = computed(() => {
     isNonUPPrivate: purpose === PURPOSE_KEY.NON_UP,
     isPhotocopyPrintingScanning,
     
-    // UI Label logic
     isAmountLabelTotalFine: isOverdueOrLost,
   };
 });
@@ -104,20 +98,16 @@ const formRequirements = computed(() => {
   return {
     // Shows Facilities Reference Number field
     isFacilities: data.value.transactionType === TRANSACTION_KEY.FACILITIES,
-    
-    // Determines if Payment Reference Number field is shown/required
     isReferenceNumberRequired: !paymentMethod || paymentMethod !== "Cash",
   };
 });
 
-// Dynamic label for the main Amount field
 const amountLabel = computed(() => {
   if (libraryFeeRequirements.value.isAmountLabelTotalFine) {
     return 'Amount (Total Fine)';
   }
   return 'Amount';
 });
-
 
 // Headless UI Display Helpers
 const selectedTransactionTypeDisplay = computed(() => {
