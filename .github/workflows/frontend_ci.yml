@@ -1,46 +1,52 @@
-  name: Frontend CI Pipeline
+name: Frontend CI Pipeline
 
-  # Trigger the workflow on pushes and pull requests to the main branches
-  on:
-    push:
-      branches: [ main, master ]
-    pull_request:
-      branches: [ main, master ]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
-  jobs:
-    build-and-lint:
-      runs-on: ubuntu-latest
-      
-      steps:
-        - name: 1. Checkout repository code
-          uses: actions/checkout@v4
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 1. Checkout repository code
+        uses: actions/checkout@v4
 
-        # Setup Node.js 20 (Current LTS and suitable for your modern stack)
-        - name: 2. Setup Node.js environment
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20.x'
+      # --- NEW: PHP Setup (Required for Ziggy/Laravel context) ---
+      - name: 2. Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Adjust this to your project's PHP version
+          extensions: mbstring, dom, curl, libxml, zip
+          coverage: none
 
-        # Implement caching for speed. This key is based on the hash of your package-lock.json.
-        - name: 3. Cache Node Modules
-          uses: actions/cache@v4
-          id: npm-cache
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-            restore-keys: |
-              ${{ runner.os }}-node-
+      - name: 3. Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-        # Use 'npm ci' (Clean Install) for CI environments. It strictly follows package-lock.json
-        - name: 4. Install Dependencies
-          run: npm ci
+      # --- Node environment ---
+      - name: 4. Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
 
-        # --- Quality Gates: Linting ---
-        # This step ensures code quality based on your 'lint' script.
-        - name: 5. Run Linter (Code Quality Check)
-          run: npm run lint
-          
-        # --- Build Artifacts ---
-        # This step verifies that the production build succeeds.
-        - name: 6. Run Production Build
-          run: npm run build
+      - name: 5. Cache Node Modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 6. Install NPM Dependencies
+        run: npm ci
+
+      - name: 7. Run Linter (Code Quality Check)
+        run: npm run lint
+        
+      # --- Build Artifacts ---
+      # Now that 'vendor/' exists, this step will no longer fail to find Ziggy
+      - name: 8. Run Production Build
+        run: npm run build
