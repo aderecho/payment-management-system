@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import { computed } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -58,4 +58,12 @@ const verificationLinkSent = computed(
             </div>
         </form>
     </GuestLayout>
+</template> -->
+
+
+<script>
+
+</script>
+<template>
+    
 </template>
