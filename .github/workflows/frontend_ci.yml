@@ -3,8 +3,7 @@ name: Frontend CI Pipeline
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+ #removed pull request
 
 jobs:
   build-and-lint:
@@ -14,24 +13,27 @@ jobs:
       - name: 1. Checkout repository code
         uses: actions/checkout@v4
 
-      # --- NEW: PHP Setup (Required for Ziggy/Laravel context) ---
       - name: 2. Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4' # Adjust this to your project's PHP version
+          php-version: '8.4' 
           extensions: mbstring, dom, curl, libxml, zip
           coverage: none
 
       - name: 3. Install Composer Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      # --- Node environment ---
-      - name: 4. Setup Node.js environment
+      # --- SEPARATE STEP: Regenerate Autoloader ---
+        #Added dump composer
+      - name: 4. Dump Composer Autoload
+        run: composer dump-autoload --optimize
+
+      - name: 5. Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
 
-      - name: 5. Cache Node Modules
+      - name: 6. Cache Node Modules
         uses: actions/cache@v4
         id: npm-cache
         with:
@@ -40,13 +42,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: 6. Install NPM Dependencies
+      - name: 7. Install NPM Dependencies
         run: npm ci
 
-      - name: 7. Run Linter (Code Quality Check)
+      - name: 8. Run Linter
         run: npm run lint
         
-      # --- Build Artifacts ---
-      # Now that 'vendor/' exists, this step will no longer fail to find Ziggy
-      - name: 8. Run Production Build
+      - name: 9. Run Production Build
         run: npm run build
