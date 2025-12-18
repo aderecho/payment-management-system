@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -119,4 +119,11 @@ const updatePassword = () => {
             </div>
         </form>
     </section>
+</template> -->
+
+<script>
+
+</script>
+<template>
+    
 </template>
