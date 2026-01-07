@@ -1,20 +1,15 @@
 # phpstan.neon
-
 parameters:
     # --- 1. ANALYSIS LEVEL ---
     # Sets the rule strictness. Level 5 is a strong, balanced starting point.
     # Increase to 9 for maximum type-safety and bug detection.
     level: 5
-    
     # --- 2. DIRECTORIES TO ANALYZE ---
     paths:
         # Core application logic
         - app/
-        # Route definitions
         - routes/
-        # Database files (models, migrations, seeders)
         - database/
-        # Test suite files (Unit and Feature tests)
         - tests/
         
     # --- 3. INCLUDES (For extending rules or setting a baseline) ---

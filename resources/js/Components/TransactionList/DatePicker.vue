@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { MOCK_TRANSACTION_DATA } from '@/stores/MockData.js'; // Ensure path is correct
 
 const props = defineProps({
     modelValue: {
@@ -9,11 +10,7 @@ const props = defineProps({
     target: {
         type: String,
         required: true,
-    },
-    minYearWithData: {
-        type: Number,
-        required: true,
-    },
+    }
 });
 
 const emit = defineEmits([
@@ -21,6 +18,11 @@ const emit = defineEmits([
     'close',
     'clear-all-dates'
 ]);
+
+// --- DYNAMIC YEAR LOGIC ---
+// Extract all years from mock data, find the minimum, or default to current year
+const extractedYears = MOCK_TRANSACTION_DATA.map(item => parseInt(item.date.split('/')[2]));
+const minYearWithData = Math.min(...extractedYears, new Date().getFullYear());
 
 const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 
@@ -55,8 +57,10 @@ initializePickerDate();
 
 const availableYears = computed(() => {
     const years = [];
-    const minYear = props.minYearWithData; 
-    for (let year = minYear; year <= currentYear; year++) {
+    const start = minYearWithData;
+    const end = currentYear;
+
+    for (let year = start; year <= end; year++) {
         years.push(year);
     }
     return years; 
@@ -67,7 +71,6 @@ const daysInMonthGrid = computed(() => {
     const monthIndex = currentSelectedMonthIndex.value;
     
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    
     const firstDayOfMonth = (new Date(year, monthIndex, 1).getDay() + 6) % 7; 
 
     const grid = [];
@@ -91,13 +94,8 @@ const daysInMonthGrid = computed(() => {
     return grid;
 });
 
-const navigateToMonthView = () => {
-    currentView.value = 'month';
-};
-
-const navigateToYearView = () => {
-    currentView.value = 'year';
-};
+const navigateToMonthView = () => { currentView.value = 'month'; };
+const navigateToYearView = () => { currentView.value = 'year'; };
 
 const selectYear = (year) => {
     currentSelectedYear.value = year;
@@ -125,30 +123,21 @@ const navigateCalendar = (direction) => {
 
         const today = new Date();
         const futuredate = new Date(newYear, newMonthIndex);
+        
+        // Block navigating into the future
         if (futuredate > new Date(today.getFullYear(), today.getMonth())) {
             currentSelectedYear.value = today.getFullYear();
             currentSelectedMonthIndex.value = today.getMonth();
-        } else if (newYear < props.minYearWithData) {
-            currentSelectedYear.value = props.minYearWithData;
+        } 
+        // Block navigating before the minimum year data
+        else if (newYear < minYearWithData) {
+            currentSelectedYear.value = minYearWithData;
             currentSelectedMonthIndex.value = 0;
         }
         else {
             currentSelectedYear.value = newYear;
             currentSelectedMonthIndex.value = newMonthIndex;
         }
-        currentSelectedDay.value = null;
-    } else if (currentView.value === 'year') {
-        const yearBlockSize = 12;
-        const currentYearIndex = availableYears.value.findIndex(y => y === currentSelectedYear.value);
-        let newYearIndex;
-        
-        if (direction > 0) {
-            newYearIndex = Math.min(availableYears.value.length - 1, currentYearIndex + yearBlockSize);
-        } else {
-            newYearIndex = Math.max(0, currentYearIndex - yearBlockSize);
-        }
-
-        currentSelectedYear.value = availableYears.value[newYearIndex];
     }
 };
 
@@ -161,7 +150,6 @@ const selectDay = (day) => {
 const applySelectedDate = (shouldClose = false) => {
     const year = currentSelectedYear.value;
     const month = String(currentSelectedMonthIndex.value + 1).padStart(2, '0');
-    
     let day = String(currentSelectedDay.value || 1).padStart(2, '0');
     
     if (props.target === 'end' && !currentSelectedDay.value) {
@@ -170,63 +158,41 @@ const applySelectedDate = (shouldClose = false) => {
     }
 
     const newDate = `${year}-${month}-${day}`;
-
-    if (new Date(newDate) <= new Date(todayDateString)) {
-        emit('update:modelValue', newDate);
-    } else {
-        emit('update:modelValue', todayDateString);
-    }
+    emit('update:modelValue', newDate);
     
-    if (shouldClose) {
-        emit('close');
-    }
+    if (shouldClose) emit('close');
 };
 
-const clearDates = () => {
-    emit('clear-all-dates');
-}
+const clearDates = () => { emit('clear-all-dates'); }
 
-defineExpose({
-    initializePickerDate
-});
+defineExpose({ initializePickerDate });
 </script>
 
 <template>
-    <div 
-        @click.self="$emit('close')"
-        class="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-50 flex items-center justify-center"
-    >
-        <div class="bg-white rounded-lg shadow-2xl p-6 transform transition-all w-96">
+    <div @click.self="$emit('close')" class="fixed inset-0 z-50 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl p-6 w-96">
             <div class="flex justify-between items-center mb-4">
                 <button 
                     @click="navigateCalendar(-1)" 
-                    class="p-2 rounded-full hover:bg-gray-100 transition duration-150 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Previous"
-                    :disabled="currentView === 'day' && currentSelectedYear <= minYearWithData && currentSelectedMonthIndex === 0"
+                    class="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30"
+                    :disabled="currentSelectedYear <= minYearWithData && currentSelectedMonthIndex === 0"
                 >
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 
                 <div class="flex gap-1">
-                    <button 
-                        @click="navigateToMonthView" 
-                        class="text-xl font-bold text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition duration-150"
-                    >
+                    <button @click="navigateToMonthView" class="text-xl font-bold hover:bg-gray-100 px-2 py-1 rounded-md">
                         {{ months[currentSelectedMonthIndex] }}
                     </button>
-                    <button 
-                        @click="navigateToYearView" 
-                        class="text-xl font-bold text-gray-900 hover:bg-gray-100 px-2 py-1 rounded-md transition duration-150"
-                    >
+                    <button @click="navigateToYearView" class="text-xl font-bold hover:bg-gray-100 px-2 py-1 rounded-md">
                         {{ currentSelectedYear }}
                     </button>
                 </div>
 
                 <button 
                     @click="navigateCalendar(1)" 
-                    class="p-2 rounded-full hover:bg-gray-100 transition duration-150 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Next"
-                    :disabled="currentView === 'day' && currentSelectedYear >= currentYear && currentSelectedMonthIndex === new Date().getMonth()"
+                    class="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30"
+                    :disabled="currentSelectedYear >= currentYear && currentSelectedMonthIndex === new Date().getMonth()"
                 >
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
@@ -234,31 +200,19 @@ defineExpose({
 
             <div v-if="currentView === 'month'" class="grid grid-cols-3 gap-2 mt-4">
                 <button 
-                    v-for="(month, index) in months" 
-                    :key="month"
+                    v-for="(month, index) in months" :key="month"
                     @click="selectMonth(index)"
-                    :class="[
-                        'py-2 rounded-lg text-sm font-medium transition-colors duration-150',
-                        currentSelectedMonthIndex === index 
-                            ? 'bg-brand-maroon text-white shadow-md'
-                            : 'text-gray-700 hover:bg-brand-maroon hover:text-white'
-                    ]"
+                    :class="['py-2 rounded-lg text-sm', currentSelectedMonthIndex === index ? 'bg-brand-maroon text-white' : 'hover:bg-gray-100']"
                 >
                     {{ month }}
                 </button>
             </div>
 
-            <div v-else-if="currentView === 'year'" class="mt-4 max-h-72 overflow-y-auto custom-scrollbar border-t pt-2 border-gray-200 grid grid-cols-4 gap-2">
+            <div v-else-if="currentView === 'year'" class="mt-4 max-h-72 overflow-y-auto grid grid-cols-4 gap-2 border-t pt-2">
                 <div 
-                    v-for="year in availableYears.slice().reverse()" 
-                    :key="year"
+                    v-for="year in availableYears.slice().reverse()" :key="year"
                     @click="selectYear(year)"
-                    :class="[
-                        'py-2 px-3 text-base transition-colors duration-150 cursor-pointer text-center rounded-md',
-                        year === currentSelectedYear
-                            ? 'bg-brand-maroon text-white font-semibold'
-                            : 'text-gray-700 hover:bg-gray-100'
-                    ]"
+                    :class="['py-2 cursor-pointer text-center rounded-md', year === currentSelectedYear ? 'bg-brand-maroon text-white' : 'hover:bg-gray-100']"
                 >
                     {{ year }}
                 </div>
@@ -270,19 +224,11 @@ defineExpose({
                 </div>
                 <div class="grid grid-cols-7 gap-1">
                     <div 
-                        v-for="(dayItem, index) in daysInMonthGrid" 
-                        :key="index"
+                        v-for="(dayItem, index) in daysInMonthGrid" :key="index"
                         :class="[
-                            'p-2 rounded-full text-sm font-medium transition-colors duration-150 flex items-center justify-center h-8 w-8 mx-auto',
-                            dayItem === null ? 'pointer-events-none' : '',
+                            'p-2 rounded-full text-sm flex items-center justify-center h-8 w-8 mx-auto',
                             dayItem && dayItem.isDisabled ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer',
-                            dayItem && !dayItem.isDisabled && currentSelectedDay === dayItem.day
-                                ? 'bg-brand-maroon text-white shadow-md'
-                                : dayItem && !dayItem.isDisabled && dayItem.isToday
-                                    ? 'bg-gray-100 text-brand-maroon border border-brand-maroon'
-                                    : dayItem && !dayItem.isDisabled
-                                        ? 'text-gray-700 hover:bg-gray-100'
-                                        : ''
+                            dayItem && currentSelectedDay === dayItem.day ? 'bg-brand-maroon text-white' : 'hover:bg-gray-100'
                         ]"
                         @click="selectDay(dayItem)"
                     >
@@ -291,31 +237,16 @@ defineExpose({
                 </div>
             </div>
 
-            <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end items-center space-x-4">
-                <button @click="clearDates" class="text-sm font-semibold text-brand-maroon hover:text-brand-maroon-hover">Clear Dates</button>
-                <button @click="$emit('close')" class="text-sm text-gray-600 hover:text-gray-800">Close</button>
-                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-brand-maroon text-white rounded-md hover:bg-brand-maroon-hover">Apply</button>
+            <div class="mt-6 pt-4 border-t flex justify-end items-center space-x-4">
+                <button @click="clearDates" class="text-sm font-semibold text-brand-maroon">Clear Dates</button>
+                <button @click="$emit('close')" class="text-sm text-gray-600">Close</button>
+                <button @click="applySelectedDate(true)" class="text-sm font-semibold px-4 py-2 bg-brand-maroon text-white rounded-md">Apply</button>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #999;
-}
+.bg-brand-maroon { background-color: #800000; }
+.text-brand-maroon { color: #800000; }
 </style>
